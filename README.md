@@ -123,7 +123,7 @@ data:,
 ```
 ### transfer
 
-The sender, transfer its own inscription to the target wallet address.
+The sender, transfer its own inscription to the `to` wallet address.
 
 |tuple|type|mandatory|description|
 |-|-|-|-|
@@ -146,7 +146,7 @@ data:,
 
 ### approve
 
-The sender sets the max number the target wallet is approved to transfer on behalf of it
+The sender sets the max number the `to` wallet is approved to transfer on behalf of the sender
 
 |tuple|type|mandatory|description|
 |-|-|-|-|
