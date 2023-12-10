@@ -23,26 +23,29 @@ An example:
 data:,{"p":"bnb-48","op":opvalue ... "tuple":tuplevalue}
 ```
 
-When asset movement is involved, the sender (if any) will always be the sender of the carrier transaction, and the receiver will always be the receiver of the carrier transaction. This rule makes sure bnb-48 standard is secured by the blockchain intrinsic consensus.
+When asset movement is involved, the asset receiver will always be the receiver (to address) of the carrier transaction. This rule makes sure bnb-48 standard is secured by the blockchain intrinsic consensus.
+
+Notice that when approved, sender is possible to move inscription on behalf of other addresses.
 
 Specifications for Each JSON Command:
 
 ### deployment
 
 The sender deploys a new inscription following bnb-48 standard and acts as the role of owner.
+The tick value must be unique, the second deploy of the same tick should be ignored by indexer.
 
 |tuple|type|mandatory|description|
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "deploy"|
 |tick|string|yes|symbol of this inscription token|
-|max|int|yes|max supply for this inscription token|
-|lim|int|yes|max amount for each mint transaction|
-|miners|array|no|array of miners consensus addresses. once set, mint is valid only if the tx is mined by one of miners listed here|
+|max|int|yes|max supply for this inscription token, must be positive|
+|lim|int|yes|max amount for each mint transaction, must be positive, must be divisible by `max`|
+|miners|array\[address\]|no|array of miners consensus addresses. once set, mint is valid only if the tx is mined by one of miners listed here. If empty array is provided, it means no restrictions on miners.|
 
 ### recap
 
-The sender, must be the owner, adjust the max supply of the inscription. 
+The sender, must be the owner, adjust the max supply of an previously deployed inscription. 
 
 New max supply must not be bigger than last valid one. In another word, it's only possible to shrink supply. Increasing is not allowed.
 
@@ -53,4 +56,52 @@ Right at the block height where recap command is confirmed on chain, if the tota
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "recap"|
 |tick|string|yes|symbol of this inscription token|
-|max|int|yes|new target max supply for this inscription token|
+|max|int|yes|new target max supply for this inscription token,must be positive, must not be bigger than previous valid max supply|
+
+### mint
+
+Sender mint a deployed inscription for `to` address
+
+|tuple|type|mandatory|description|
+|-|-|-|-|
+|p|string|yes|fixed, "bnb-48"|
+|op|string|yes|fixed, "mint"|
+|tick|string|yes|symbol of this inscription token|
+|amt|int|yes|must be positive, must not be bigger than the lim parameter in deploy command|
+
+### transfer
+
+The sender, transfer its own inscription to the target wallet address.
+
+|tuple|type|mandatory|description|
+|-|-|-|-|
+|p|string|yes|fixed, "bnb-48"|
+|op|string|yes|fixed, "transfer"|
+|tick|string|yes|symbol of this inscription token|
+|amt|int|yes|must be positive, must not be bigger than balance of current sender address|
+
+### approve
+
+The sender sets the max number the target wallet is approved to transfer on behalf of it
+
+|tuple|type|mandatory|description|
+|-|-|-|-|
+|p|string|yes|fixed, "bnb-48"|
+|op|string|yes|fixed, "approve"|
+|tick|string|yes|symbol of this inscription token|
+|amt|int|yes|must be positive, must not be bigger than the max supply|
+|spender|address|yes|spender|
+
+
+### transferFrom
+
+The sender, transfer inscription of the `fromWallet` address to the `to` wallet address.
+Once succeed, transfered amount should be deducted from sender's approved amount by fromWallet.
+
+|tuple|type|mandatory|description|
+|-|-|-|-|
+|p|string|yes|fixed, "bnb-48"|
+|op|string|yes|fixed, "transferFrom"|
+|fromWallet|address|yes|of which the sender spend on behalf|
+|tick|string|yes|symbol of this inscription token|
+|amt|int|yes|must be positive, must not be bigger than balance of fromWallet, must not be bigger than sender's remaining approved amount by fromWallet|
