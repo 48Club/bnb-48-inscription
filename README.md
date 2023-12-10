@@ -169,16 +169,16 @@ data:,
 ```
 ### transferFrom
 
-The sender, transfer inscription of the `fromWallet` address to the `to` wallet address.
-Once succeed, transfered amount should be deducted from sender's approved amount by fromWallet.
+The sender, transfer inscription of the parameter from  to the transaction `to` address.
+Once succeed, transfered amount should be deducted from sender's approved amount by parameter from.
 
 |tuple|type|mandatory|description|
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "transferFrom"|
 |tick|string|yes|symbol of this inscription token|
-|fromWallet|address|yes|of which the sender spend on behalf|
-|amt|int|yes|must be positive, must not be bigger than balance of fromWallet, must not be bigger than sender's remaining approved amount by fromWallet|
+|from|address|yes|of which the sender spend on behalf|
+|amt|int|yes|must be positive, must not be bigger than balance of parameter from address, must not be bigger than sender's remaining approved amount by parameter from|
 
 
 Example:
@@ -188,7 +188,7 @@ data:,
   "p":"bnb-48",
   "op":"transferFrom",
   "tick":"fans",
-  "fromWallet":"0x72b61c6014342d914470eC7aC2975bE345796c2b",
+  "from":"0x72b61c6014342d914470eC7aC2975bE345796c2b",
   "amt":"1"
 }
 ```
