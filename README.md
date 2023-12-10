@@ -22,6 +22,21 @@ An example:
 ```
 data:,{"p":"bnb-48","op":opvalue ... "tuple":tuplevalue}
 ```
+The spaces, breaks and items order in serialized json don't matter, which means the following is equally valid:
+
+```
+data:
+,
+{
+"op":opvalue,
+"p"
+:
+  "bnb-48"
+ ... "tuple":tuplevalue
+}
+```
+
+Indexer should correctly parse the json part instead of relying on a fixed piece of hex data.
 
 When asset movement is involved, the asset receiver will always be the receiver (to address) of the carrier transaction. This rule makes sure bnb-48 standard is secured by the blockchain intrinsic consensus.
 
@@ -43,6 +58,21 @@ The tick value must be unique, the second deploy of the same tick should be igno
 |lim|int|yes|max amount for each mint transaction, must be positive, must be divisible by `max`|
 |miners|array\[address\]|no|array of miners consensus addresses. once set, mint is valid only if the tx is mined by one of miners listed here. If empty array is provided, it means no restrictions on miners.|
 
+Example:
+```
+data:,
+{
+  "p":"bnb-48",
+  "op":"deploy",
+  "tick":"fans",
+  "max":"3388230",
+  "lim":"1",
+  "miners":[
+    "0x72b61c6014342d914470eC7aC2975bE345796c2b"
+  ]
+}
+```
+
 ### recap
 
 The sender, must be the owner, adjust the max supply of an previously deployed inscription. 
@@ -58,6 +88,17 @@ Right at the block height where recap command is confirmed on chain, if the tota
 |tick|string|yes|symbol of this inscription token|
 |max|int|yes|new target max supply for this inscription token,must be positive, must not be bigger than previous valid max supply|
 
+
+Example:
+```
+data:,
+{
+  "p":"bnb-48",
+  "op":"recap",
+  "tick":"fans",
+  "max":"1000000"
+}
+```
 ### mint
 
 Sender mint a deployed inscription for `to` address
@@ -69,6 +110,17 @@ Sender mint a deployed inscription for `to` address
 |tick|string|yes|symbol of this inscription token|
 |amt|int|yes|must be positive, must not be bigger than the lim parameter in deploy command|
 
+
+Example:
+```
+data:,
+{
+  "p":"bnb-48",
+  "op":"mint",
+  "tick":"fans",
+  "amt":"1"
+}
+```
 ### transfer
 
 The sender, transfer its own inscription to the target wallet address.
@@ -79,6 +131,18 @@ The sender, transfer its own inscription to the target wallet address.
 |op|string|yes|fixed, "transfer"|
 |tick|string|yes|symbol of this inscription token|
 |amt|int|yes|must be positive, must not be bigger than balance of current sender address|
+
+
+Example:
+```
+data:,
+{
+  "p":"bnb-48",
+  "op":"transfer",
+  "tick":"fans",
+  "amt":"1"
+}
+```
 
 ### approve
 
@@ -92,7 +156,17 @@ The sender sets the max number the target wallet is approved to transfer on beha
 |amt|int|yes|must be positive, must not be bigger than the max supply|
 |spender|address|yes|spender|
 
-
+Example:
+```
+data:,
+{
+  "p":"bnb-48",
+  "op":"approve",
+  "tick":"fans",
+  "amt":"1",
+  "spender":"0x72b61c6014342d914470eC7aC2975bE345796c2b"
+}
+```
 ### transferFrom
 
 The sender, transfer inscription of the `fromWallet` address to the `to` wallet address.
@@ -102,6 +176,19 @@ Once succeed, transfered amount should be deducted from sender's approved amount
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "transferFrom"|
-|fromWallet|address|yes|of which the sender spend on behalf|
 |tick|string|yes|symbol of this inscription token|
+|fromWallet|address|yes|of which the sender spend on behalf|
 |amt|int|yes|must be positive, must not be bigger than balance of fromWallet, must not be bigger than sender's remaining approved amount by fromWallet|
+
+
+Example:
+```
+data:,
+{
+  "p":"bnb-48",
+  "op":"transferFrom",
+  "tick":"fans",
+  "fromWallet":"0x72b61c6014342d914470eC7aC2975bE345796c2b",
+  "amt":"1"
+}
+```
