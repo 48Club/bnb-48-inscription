@@ -74,6 +74,7 @@ The tick value must be unique, the second deploy of the same tick should be igno
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "deploy"|
 |tick|string|yes|symbol of this inscription token|
+|decimal|int|optional|must not be less than 0, default 0, max 18. this parameter will be adopted by all parameters regarding balance or change of token amount, including `max` `lmt` `amt` etc.|
 |max|int|yes|max supply for this inscription token, must be positive|
 |lim|int|yes|max amount for each mint transaction, must be positive, must be divisible by `max`|
 |miners|array\[address\]|no|array of miners consensus addresses. once set, mint is valid only if the tx is mined by one of miners listed here. If empty array is provided, it means no restrictions on miners.|
@@ -85,13 +86,15 @@ data:,
   "p":"bnb-48",
   "op":"deploy",
   "tick":"fans",
-  "max":"3388230",
-  "lim":"1",
+  "decimal":"6",
+  "max":"3388230000000",
+  "lim":"1000000",
   "miners":[
     "0x72b61c6014342d914470eC7aC2975bE345796c2b"
   ]
 }
 ```
+In this case, the max supply is `max` / 10^`decimal` = 3388230, the limit of each mint is `lmt` / 10^`decimal` = 1
 
 ### recap
 
