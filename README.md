@@ -77,6 +77,7 @@ The tick value must be unique, the second deploy of the same tick should be igno
 |decimal|U256|optional|must not be less than 0, default 0, max 18. this parameter will be adopted by all parameters regarding balance or change of token amount, including `max` `lim` `amt` etc.|
 |max|U256|yes|max supply for this inscription token, must be positive|
 |lim|U256|yes|max amount for each mint transaction, must be positive, must be divisible by `max`|
+|airdrops|array\[address:U256\]|no|array of values for addresses, initial allocation, sum of all value must not be bigger than max supply|
 |miners|array\[address\]|no|array of miners consensus addresses. once set, mint is valid only if the tx is mined by one of miners listed here. If empty array is provided, it means no restrictions on miners.|
 
 JSON Example:
@@ -89,12 +90,18 @@ data:,
   "decimal":"6",
   "max":"3388230000000",
   "lim":"1000000",
+  "airdrops":[
+    "0x72b61c6014342d914470eC7aC2975bE345796c2b":"1000000000"
+  ]
   "miners":[
     "0x72b61c6014342d914470eC7aC2975bE345796c2b"
   ]
 }
 ```
-In this case, the max supply is `max` / 10^`decimal` = 3388230, the limit of each mint is `lmt` / 10^`decimal` = 1
+In this case: 
+the max supply is `max` / 10^`decimal` = 3388230
+the limit of each mint is `lmt` / 10^`decimal` = 1
+the initial balance of 0x72b61c6014342d914470eC7aC2975bE345796c2b is 1000000000/10^`decimal` = 1000
 
 ### recap
 
