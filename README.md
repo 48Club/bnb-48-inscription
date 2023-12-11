@@ -7,42 +7,61 @@ The bnb-48 inscription standard ensures a structured and identifiable format for
 
 ## Main Features
 
-1. No pre-authorization is required; the system is open for anyone to issue inscriptions following the bnb-48 standard.
-Implication: This approach fosters inclusivity, allowing a wide range of participants to seamlessly engage in the inscription process.
-2. Unlike an NFT standard, bnb-48 is not designed for non-fungible tokens. This design choice facilitates bulk transfers, ensuring a cost-effective and efficient process.
-Community-Orientation:
-3. Providing functionality interfaces similar to ERC-20, these interfaces form the foundational infrastructure for DeFi.
-4. Community activities can be directly reflected through the bnb-48 standard. Furthermore, the standard is designed to accommodate evolution, allowing for backward-compatible upgrades. This feature enables continuous improvement while maintaining compatibility with existing implementations.
+1. Unlike an NFT standard, bnb-48 is not designed for non-fungible tokens. This design choice facilitates native bulk transfers.
+2. Providing functionality interfaces similar to ERC-20, these interfaces form the foundational infrastructure for DeFi.
+3. Multi commands are allowed to be carried in a single tx, ensuring a cost-effective and efficient process.
+4. Multiple serialization formats support. Developer is free to choose read-freindly format like json or efficiency orientation format like protobuffer.
+5. Backward compatible upgradability.
 
+## Data format:
+The data part typically consists of an serialized data object following a format notation (ALL CAPITAL). If the format notation is not provided, data object will be treated as JSON defaultly.
 
-## Agreement:
-The call data format typically consists of an unmarched JSON following the predetermined string `data:,`
+On chains which don't support plain text memo, like EVM compatible chains, data load should be converted from utf-8 to hex before being put in to call data.
 
 An example:
 ```
-data:,{"p":"bnb-48","op":opvalue ... "tuple":tuplevalue}
-```
-The spaces, breaks and items order in serialized json don't matter, which means the following is equally valid:
-
-```
-data:
-,
+data:,
 {
-"op":opvalue,
-"p"
-:
-  "bnb-48"
- ... "tuple":tuplevalue
+  "p":"bnb-48",
+  "op":"command"
 }
 ```
+or
 
-Indexer should correctly parse the json part instead of relying on a fixed piece of hex data.
+```
+data:JSON, 
+{
+  "p":"bnb-48",
+  "op":"command"
+}
+```
+Where `JSON` is explicitly specified.
 
-When asset movement is involved, the asset receiver will always be the receiver (to address) of the carrier transaction. This rule makes sure bnb-48 standard is secured by the blockchain intrinsic consensus.
+Bulk commands are allowed. If multiple commands is carried in a sigle transaction, the data should be packed in an array, each item of which contains a complete command, and each command will be handled in order. In which case, all combined commands are executed atomicly, i.e. either all of them are successfully executed or none of them.
 
-Notice that when approved, sender is possible to move inscription on behalf of other addresses.
+example:
 
-Specifications for Each JSON Command:
+```
+data:JSON,
+[
+  {
+    "p":"bnb-48",
+    "op":"deploy",
+    "tick":"token1"
+  },
+  {
+    "p":"bnb-48",
+    "op":"deploy",
+    "tick":"token2"
+  }
+]
+```
+Specially, `mint` command must be a standalone command. If bulk commands in a single transaction contains a `mint`, the entire transaction should be considered as invalid.
+
+
+Indexer should correctly parse the data object according to data format instead of relying on a fixed piece of (hex) data.
+
+## Command
 
 ### deployment
 
@@ -58,7 +77,7 @@ The tick value must be unique, the second deploy of the same tick should be igno
 |lim|int|yes|max amount for each mint transaction, must be positive, must be divisible by `max`|
 |miners|array\[address\]|no|array of miners consensus addresses. once set, mint is valid only if the tx is mined by one of miners listed here. If empty array is provided, it means no restrictions on miners.|
 
-Example:
+JSON Example:
 ```
 data:,
 {
@@ -89,7 +108,7 @@ Right at the block height where recap command is confirmed on chain, if the tota
 |max|int|yes|new target max supply for this inscription token,must be positive, must not be bigger than previous valid max supply|
 
 
-Example:
+JSON Example:
 ```
 data:,
 {
@@ -101,7 +120,7 @@ data:,
 ```
 ### mint
 
-Sender mint a deployed inscription for `to` address
+Sender mint a deployed inscription for `to` address of the carrier tx
 
 |tuple|type|mandatory|description|
 |-|-|-|-|
@@ -111,7 +130,7 @@ Sender mint a deployed inscription for `to` address
 |amt|int|yes|must be positive, must not be bigger than the lim parameter in deploy command|
 
 
-Example:
+JSON Example:
 ```
 data:,
 {
@@ -123,48 +142,51 @@ data:,
 ```
 ### transfer
 
-The sender, transfer its own inscription to the `to` wallet address.
+The sender, transfer its own inscription to other wallet.
 
 |tuple|type|mandatory|description|
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "transfer"|
 |tick|string|yes|symbol of this inscription token|
+|to|address|yes|asset receiver|
 |amt|int|yes|must be positive, must not be bigger than balance of current sender address|
 
 
-Example:
+JSON Example:
 ```
 data:,
 {
   "p":"bnb-48",
   "op":"transfer",
   "tick":"fans",
+  "to":"0x72b61c6014342d914470eC7aC2975bE345796c2b",
   "amt":"1"
 }
 ```
 
 ### approve
 
-The sender sets the max number the `to` wallet is approved to transfer on behalf of the sender
+The sender sets the max number the spender wallet is approved to transfer on behalf of the sender
 
 |tuple|type|mandatory|description|
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "approve"|
 |tick|string|yes|symbol of this inscription token|
-|amt|int|yes|must be positive, must not be bigger than the max supply|
 |spender|address|yes|spender|
+|amt|int|yes|must be positive, must not be bigger than the max supply|
 
-Example:
+
+JSON Example:
 ```
 data:,
 {
   "p":"bnb-48",
   "op":"approve",
   "tick":"fans",
-  "amt":"1",
-  "spender":"0x72b61c6014342d914470eC7aC2975bE345796c2b"
+  "spender":"0x72b61c6014342d914470eC7aC2975bE345796c2b",
+  "amt":"1"
 }
 ```
 ### transferFrom
@@ -178,10 +200,11 @@ Once succeed, transfered amount should be deducted from sender's approved amount
 |op|string|yes|fixed, "transferFrom"|
 |tick|string|yes|symbol of this inscription token|
 |from|address|yes|of which the sender spend on behalf|
+|to|address|yes|asset receiver|
 |amt|int|yes|must be positive, must not be bigger than balance of parameter from address, must not be bigger than sender's remaining approved amount by parameter from|
 
 
-Example:
+JSON Example:
 ```
 data:,
 {
@@ -189,6 +212,7 @@ data:,
   "op":"transferFrom",
   "tick":"fans",
   "from":"0x72b61c6014342d914470eC7aC2975bE345796c2b",
+  "to":"0x72b61c6014342d914470eC7aC2975bE345796c2b",
   "amt":"1"
 }
 ```
