@@ -1,7 +1,7 @@
 # Standards of bnb-48 Inscription
 
 ## Introduction:
-The process of inscription involves a sequence of commands affixed to transactions in hexadecimal format. Notably, bnb-48 serves as a standard for inscription on the BNB Smart Chain, with '48' denoting its association with the 48 Club.
+The process of inscription involves a sequence of commands affixed to transactions in hexadecimal format. 
 
 The bnb-48 inscription standard ensures a structured and identifiable format for commands attached to transactions on the BNB Smart Chain. The integration of these specifications aims to provide clarity and coherence in the execution of operations.
 
@@ -13,6 +13,9 @@ The bnb-48 inscription standard ensures a structured and identifiable format for
 4. Multi commands are allowed to be carried in a single tx, ensuring a cost-effective and efficient process.
 5. Multiple serialization formats support. Developer is free to choose read-freindly format like json or efficiency orientation format like protobuffer.
 6. Backward compatible upgradability.
+
+
+Notably, bnb-48 serves as a standard for inscription originated on the BNB Smart Chain, with '48' denoting its association with the 48 Club.
 
 ## Data format:
 The data part typically consists of an serialized data object following a format notation (ALL CAPITAL). If the format notation is not provided, data object will be treated as JSON defaultly.
