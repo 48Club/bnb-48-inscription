@@ -1,4 +1,4 @@
-<img width="943" alt="image" src="https://github.com/48Club/bnb-48-inscription/assets/39881426/cbbd9409-bcd1-4b1d-9e55-0ab1bb67414b"># Standards of bnb-48 Inscription
+# Standards of bnb-48 Inscription
 
 ## Introduction:
 The process of inscription involves a sequence of commands affixed to transactions in hexadecimal format. Notably, bnb-48 serves as a standard for inscription on the BNB Smart Chain, with '48' denoting its association with the 48 Club.
