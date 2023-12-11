@@ -3,7 +3,7 @@
 ## Introduction:
 The process of inscription involves a sequence of commands affixed to transactions in hexadecimal format. 
 
-The bnb-48 inscription standard ensures a structured and identifiable format for commands attached to transactions on the BNB Smart Chain. The integration of these specifications aims to provide clarity and coherence in the execution of operations.
+The bnb-48 inscription standard ensures a structured and identifiable format for commands attached to transactions on any block chain. The integration of these specifications aims to provide clarity and coherence in the execution of operations.
 
 
 ## Main Features
