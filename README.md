@@ -1,4 +1,4 @@
-# Standards of bnb-48 Inscription
+<img width="943" alt="image" src="https://github.com/48Club/bnb-48-inscription/assets/39881426/cbbd9409-bcd1-4b1d-9e55-0ab1bb67414b"># Standards of bnb-48 Inscription
 
 ## Introduction:
 The process of inscription involves a sequence of commands affixed to transactions in hexadecimal format. Notably, bnb-48 serves as a standard for inscription on the BNB Smart Chain, with '48' denoting its association with the 48 Club.
@@ -74,9 +74,9 @@ The tick value must be unique, the second deploy of the same tick should be igno
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "deploy"|
 |tick|string|yes|symbol of this inscription token|
-|decimal|int|optional|must not be less than 0, default 0, max 18. this parameter will be adopted by all parameters regarding balance or change of token amount, including `max` `lmt` `amt` etc.|
-|max|int|yes|max supply for this inscription token, must be positive|
-|lim|int|yes|max amount for each mint transaction, must be positive, must be divisible by `max`|
+|decimal|U256|optional|must not be less than 0, default 0, max 18. this parameter will be adopted by all parameters regarding balance or change of token amount, including `max` `lim` `amt` etc.|
+|max|U256|yes|max supply for this inscription token, must be positive|
+|lim|U256|yes|max amount for each mint transaction, must be positive, must be divisible by `max`|
 |miners|array\[address\]|no|array of miners consensus addresses. once set, mint is valid only if the tx is mined by one of miners listed here. If empty array is provided, it means no restrictions on miners.|
 
 JSON Example:
@@ -109,7 +109,7 @@ Right at the block height where recap command is confirmed on chain, if the tota
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "recap"|
 |tick|string|yes|symbol of this inscription token|
-|max|int|yes|new target max supply for this inscription token,must be positive, must not be bigger than previous valid max supply|
+|max|U256|yes|new target max supply for this inscription token,must be positive, must not be bigger than previous valid max supply|
 
 
 JSON Example:
@@ -131,7 +131,7 @@ Sender mint a deployed inscription for `to` address of the carrier tx
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "mint"|
 |tick|string|yes|symbol of this inscription token|
-|amt|int|yes|must be positive, must not be bigger than the lim parameter in deploy command|
+|amt|U256|yes|must be positive, must not be bigger than the lim parameter in deploy command|
 
 
 JSON Example:
@@ -154,7 +154,7 @@ The sender, transfer its own inscription to other wallet.
 |op|string|yes|fixed, "transfer"|
 |tick|string|yes|symbol of this inscription token|
 |to|address|yes|asset receiver|
-|amt|int|yes|must be positive, must not be bigger than balance of current sender address|
+|amt|U256|yes|must be positive, must not be bigger than balance of current sender address|
 
 
 JSON Example:
@@ -179,7 +179,7 @@ Total supply of this inscription token should be deducted accordingly
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "burn"|
 |tick|string|yes|symbol of this inscription token|
-|amt|int|yes|must be positive, must not be bigger than balance of current sender address|
+|amt|U256|yes|must be positive, must not be bigger than balance of current sender address|
 
 
 JSON Example:
@@ -203,7 +203,7 @@ The sender sets the max number the spender wallet is approved to transfer on beh
 |op|string|yes|fixed, "approve"|
 |tick|string|yes|symbol of this inscription token|
 |spender|address|yes|spender|
-|amt|int|yes|must be positive, must not be bigger than the max supply|
+|amt|U256|yes|must be positive, must not be bigger than the max supply|
 
 
 JSON Example:
@@ -229,7 +229,7 @@ Once succeed, transfered amount should be deducted from sender's approved amount
 |tick|string|yes|symbol of this inscription token|
 |from|address|yes|of which the sender spend on behalf|
 |to|address|yes|asset receiver|
-|amt|int|yes|must be positive, must not be bigger than balance of parameter from address, must not be bigger than sender's remaining approved amount by parameter from|
+|amt|U256|yes|must be positive, must not be bigger than balance of parameter from address, must not be bigger than sender's remaining approved amount by parameter from|
 
 
 JSON Example:
