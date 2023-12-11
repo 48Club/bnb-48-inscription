@@ -5,13 +5,14 @@ The process of inscription involves a sequence of commands affixed to transactio
 
 The bnb-48 inscription standard ensures a structured and identifiable format for commands attached to transactions on the BNB Smart Chain. The integration of these specifications aims to provide clarity and coherence in the execution of operations.
 
-## Main Features
 
-1. Unlike an NFT standard, bnb-48 is not designed for non-fungible tokens. This design choice facilitates native bulk transfers.
-2. Providing functionality interfaces similar to ERC-20, these interfaces form the foundational infrastructure for DeFi.
-3. Multi commands are allowed to be carried in a single tx, ensuring a cost-effective and efficient process.
-4. Multiple serialization formats support. Developer is free to choose read-freindly format like json or efficiency orientation format like protobuffer.
-5. Backward compatible upgradability.
+## Main Features
+1. Block Chain Transparency. bnb-48 standard is suitable for any blockchain, as far as transactions on this chain supports calldata/memo/remark etc. It's super easy for indexers to track bnb-48 inscription even across different blockchains.
+2. Unlike an NFT standard, bnb-48 is not designed for non-fungible tokens. This design choice facilitates native bulk transfers.
+3. Providing functionality interfaces similar to ERC-20, these interfaces form the foundational infrastructure for DeFi.
+4. Multi commands are allowed to be carried in a single tx, ensuring a cost-effective and efficient process.
+5. Multiple serialization formats support. Developer is free to choose read-freindly format like json or efficiency orientation format like protobuffer.
+6. Backward compatible upgradability.
 
 ## Data format:
 The data part typically consists of an serialized data object following a format notation (ALL CAPITAL). If the format notation is not provided, data object will be treated as JSON defaultly.
@@ -161,6 +162,30 @@ data:,
   "op":"transfer",
   "tick":"fans",
   "to":"0x72b61c6014342d914470eC7aC2975bE345796c2b",
+  "amt":"1"
+}
+```
+### burn
+
+The sender, burn its own inscription
+
+Total supply of this inscription token should be deducted accordingly
+
+|tuple|type|mandatory|description|
+|-|-|-|-|
+|p|string|yes|fixed, "bnb-48"|
+|op|string|yes|fixed, "burn"|
+|tick|string|yes|symbol of this inscription token|
+|amt|int|yes|must be positive, must not be bigger than balance of current sender address|
+
+
+JSON Example:
+```
+data:,
+{
+  "p":"bnb-48",
+  "op":"burn",
+  "tick":"fans",
   "amt":"1"
 }
 ```
