@@ -102,9 +102,13 @@ the max supply is `max` / 10^`decimal` = 3388230
 the limit of each mint is `lmt` / 10^`decimal` = 1
 
 The txhash of this very transaction which carries the deploy command is an important unique identity for this inscription token, called `deploy hash`
+
 Moreover, `tick-hash` is defied as `tick`+`deploy hash`, where `0x` is trimmed.  e.g. 
+
 `tich` of bnb-48 fans is `fans`
+
 `tick-hash` of bnb-48 is `fans-d893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2`
+
 You can use any of above to specify the token you would like to operate, do notice `tich-hash` is recommended over `tich` in other op command, to avoid identity confliction
 
 ### recap
