@@ -71,7 +71,7 @@ Indexer should correctly parse the data object according to data format instead 
 
 The sender deploys a new inscription following bnb-48 standard and acts as the role of owner.
 
-If the tick value is not unique, operation on the second or later deployed one should carry tick-hash instead of tick to avoid confliction.
+If the tick value is not unique, operation on the second or later deployed one should carry tick-hash as a mandatory parameter to avoid confliction. Otherwise, op will be considered as upon the very first inscription shares the identical tick.
 
 |tuple|type|mandatory|description|
 |-|-|-|-|
@@ -104,11 +104,11 @@ the limit of each mint is `lmt` / 10^`decimal` = 1
 
 The txhash of this very transaction which carries the deploy command is an important unique identity for this inscription token, called `deploy hash`
 
-Moreover, `tick-hash` is defied as `tick`+`deploy hash`, where `0x` is trimmed.  e.g. 
+Moreover, `tick-hash` is defied as deploy hash where prefix `0x` trimmed.  e.g. 
 
 `tich` of bnb-48 fans is `fans`
 
-`tick-hash` of bnb-48 fans is `fans-d893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2`
+`tick-hash` of bnb-48 fans is `d893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2`
 
 You can use any of above to specify the token you would like to operate, do notice `tich-hash` is recommended over `tich` in other op command, to avoid identity confliction
 
@@ -124,7 +124,7 @@ Right at the block height where recap command is confirmed on chain, if the tota
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "recap"|
-|tick|string|no|symbol of this inscription token|
+|tick|string|yes|symbol of this inscription token|
 |tick-hash|string|no|tich-hash of this inscription token|
 |max|U256|yes|new target max supply for this inscription token,must be positive, must not be bigger than previous valid max supply|
 
@@ -147,7 +147,7 @@ Sender mint a deployed inscription for `to` address of the carrier tx
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "mint"|
-|tick|string|no|symbol of this inscription token|
+|tick|string|yes|symbol of this inscription token|
 |tick-hash|string|no|tich-hash of this inscription token|
 |amt|U256|yes|must be positive, must not be bigger than the lim parameter in deploy command|
 
@@ -170,7 +170,7 @@ The sender, transfer its own inscription to other wallet.
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "transfer"|
-|tick|string|no|symbol of this inscription token|
+|tick|string|yes|symbol of this inscription token|
 |tick-hash|string|no|tich-hash of this inscription token|
 |to|address|yes|asset receiver|
 |amt|U256|yes|must be positive, must not be bigger than balance of current sender address|
@@ -197,7 +197,7 @@ Total supply of this inscription token should be deducted accordingly
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "burn"|
-|tick|string|no|symbol of this inscription token|
+|tick|string|yes|symbol of this inscription token|
 |tick-hash|string|no|tich-hash of this inscription token|
 |amt|U256|yes|must be positive, must not be bigger than balance of current sender address|
 
@@ -221,7 +221,7 @@ The sender sets the max number the spender wallet is approved to transfer on beh
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "approve"|
-|tick|string|no|symbol of this inscription token|
+|tick|string|yes|symbol of this inscription token|
 |tick-hash|string|no|tich-hash of this inscription token|
 |spender|address|yes|spender|
 |amt|U256|yes|must be positive, must not be bigger than the max supply|
@@ -247,7 +247,7 @@ Once succeed, transfered amount should be deducted from sender's approved amount
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "transferFrom"|
-|tick|string|no|symbol of this inscription token|
+|tick|string|yes|symbol of this inscription token|
 |tick-hash|string|no|tich-hash of this inscription token|
 |from|address|yes|of which the sender spend on behalf|
 |to|address|yes|asset receiver|
