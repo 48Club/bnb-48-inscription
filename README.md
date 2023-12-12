@@ -125,7 +125,7 @@ Right at the block height where recap command is confirmed on chain, if the tota
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "recap"|
 |tick|string|yes|symbol of this inscription token|
-|tick-hash|string|no|tich-hash of this inscription token|
+|tick-hash|string|no|tick-hash of this inscription token|
 |max|U256|yes|new target max supply for this inscription token,must be positive, must not be bigger than previous valid max supply|
 
 
@@ -148,7 +148,7 @@ Sender mint a deployed inscription for `to` address of the carrier tx
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "mint"|
 |tick|string|yes|symbol of this inscription token|
-|tick-hash|string|no|tich-hash of this inscription token|
+|tick-hash|string|no|tick-hash of this inscription token|
 |amt|U256|yes|must be positive, must not be bigger than the lim parameter in deploy command|
 
 
@@ -171,7 +171,7 @@ The sender, transfer its own inscription to other wallet.
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "transfer"|
 |tick|string|yes|symbol of this inscription token|
-|tick-hash|string|no|tich-hash of this inscription token|
+|tick-hash|string|no|tick-hash of this inscription token|
 |to|address|yes|asset receiver|
 |amt|U256|yes|must be positive, must not be bigger than balance of current sender address|
 
@@ -198,7 +198,7 @@ Total supply of this inscription token should be deducted accordingly
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "burn"|
 |tick|string|yes|symbol of this inscription token|
-|tick-hash|string|no|tich-hash of this inscription token|
+|tick-hash|string|no|tick-hash of this inscription token|
 |amt|U256|yes|must be positive, must not be bigger than balance of current sender address|
 
 
@@ -222,7 +222,7 @@ The sender sets the max number the spender wallet is approved to transfer on beh
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "approve"|
 |tick|string|yes|symbol of this inscription token|
-|tick-hash|string|no|tich-hash of this inscription token|
+|tick-hash|string|no|tick-hash of this inscription token|
 |spender|address|yes|spender|
 |amt|U256|yes|must be positive, must not be bigger than the max supply|
 
@@ -248,7 +248,7 @@ Once succeed, transfered amount should be deducted from sender's approved amount
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "transferFrom"|
 |tick|string|yes|symbol of this inscription token|
-|tick-hash|string|no|tich-hash of this inscription token|
+|tick-hash|string|no|tick-hash of this inscription token|
 |from|address|yes|of which the sender spend on behalf|
 |to|address|yes|asset receiver|
 |amt|U256|yes|must be positive, must not be bigger than balance of parameter from address, must not be bigger than sender's remaining approved amount by parameter from|
