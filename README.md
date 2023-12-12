@@ -80,8 +80,6 @@ Another important thing is, value types defined in this document should be respe
 
 The sender deploys a new inscription following bnb-48 standard and acts as the role of owner.
 
-If the tick value is not unique, operation on the second or later deployed one should carry id as a mandatory parameter to avoid confliction. Otherwise, op will be considered as upon the very first inscription shares the identical tick.
-
 |tuple|type|mandatory|description|
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
