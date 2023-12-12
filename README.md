@@ -18,7 +18,7 @@ The bnb-48 inscription standard ensures a structured and identifiable format for
 Notably, bnb-48 serves as a standard for inscription originated on the BNB Smart Chain, with '48' denoting its association with the 48 Club.
 
 ## Data format:
-The data part typically consists of an serialized data object following a format notation (ALL CAPITAL). If the format notation is not provided, data object will be treated as JSON defaultly.
+The data part typically consists of an serialized data object following [data URL scheme](https://datatracker.ietf.org/doc/html/rfc2397). If the format notation is not provided, data object will be treated as `application/json` defaultly.
 
 On chains which don't support plain text memo, like EVM compatible chains, data load should be converted from utf-8 to hex before being put in to call data.
 
@@ -33,13 +33,13 @@ data:,
 or
 
 ```
-data:JSON, 
+data:application/json, 
 {
   "p":"bnb-48",
   "op":"command"
 }
 ```
-Where `JSON` is explicitly specified.
+Where json is explicitly specified.
 
 Bulk commands are allowed. If multiple commands is carried in a sigle transaction, the data should be packed in an array, each item of which contains a complete command, and each command will be handled in order. In which case, all combined commands are executed atomicly, i.e. either all of them are successfully executed or none of them.
 
