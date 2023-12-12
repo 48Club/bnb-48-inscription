@@ -70,7 +70,8 @@ Indexer should correctly parse the data object according to data format instead 
 ### deployment
 
 The sender deploys a new inscription following bnb-48 standard and acts as the role of owner.
-The tick value must be unique, the second deploy of the same tick should be ignored by indexer.
+
+If the tick value is not unique, operation on the second or later deployed one should carry tick-hash instead of tick to avoid confliction.
 
 |tuple|type|mandatory|description|
 |-|-|-|-|
