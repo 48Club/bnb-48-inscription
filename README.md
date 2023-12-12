@@ -27,7 +27,9 @@ An example:
 data:,
 {
   "p":"bnb-48",
-  "op":"command"
+  "op":"command",
+  "parameter1":value
+  ...
 }
 ```
 or
@@ -36,34 +38,41 @@ or
 data:application/json, 
 {
   "p":"bnb-48",
-  "op":"command"
+  "op":"command",
+  "parameter1":value
+  ...
 }
 ```
 Where json is explicitly specified.
 
-Bulk commands are allowed. If multiple commands is carried in a sigle transaction, the data should be packed in an array, each item of which contains a complete command, and each command will be handled in order. In which case, all combined commands are executed atomicly, i.e. either all of them are successfully executed or none of them.
+Bulk commands are allowed when all commands share an op. If multiple commands is carried in a sigle transaction, the data should be packed in an array, each item of which contains a complete command, and each command will be handled in order. In which case, all combined commands are executed atomicly, i.e. either all of them are successfully executed or none of them.
+
+Specially, `mint` `recap` and `deploy` command must be a standalone command. If bulk commands in a single transaction contains a `mint` `recap` or `deploy`, the entire bulk should be considered as invalid.
 
 example:
 
 ```
-data:JSON,
+data:application/json,
 [
   {
     "p":"bnb-48",
-    "op":"deploy",
-    "tick":"token1"
+    "op":"transfer",
+    "tick":"token1",
+    ...
   },
   {
     "p":"bnb-48",
-    "op":"deploy",
-    "tick":"token2"
+    "op":"transfer",
+    "tick":"token2",
+    ...
   }
 ]
 ```
-Specially, `mint` `recap` and `deploy` command must be a standalone command. If bulk commands in a single transaction contains a `mint` `recap` or `deploy`, the entire transaction should be considered as invalid.
 
 
-Indexer should correctly parse the data object according to data format instead of relying on a fixed piece of (hex) data.
+Indexer should correctly parse the data object according to data format instead of relying on a fixed piece of (hex) data, which means, spaces and breaks don't change a command, as well as the serialized sequence of key-value pairs. 
+
+Another important thing is, value types defined in this document should be respect, filling in string (quoted by \") will be treated as invalid command.
 
 ## Command
 
@@ -71,7 +80,7 @@ Indexer should correctly parse the data object according to data format instead 
 
 The sender deploys a new inscription following bnb-48 standard and acts as the role of owner.
 
-If the tick value is not unique, operation on the second or later deployed one should carry tick-hash as a mandatory parameter to avoid confliction. Otherwise, op will be considered as upon the very first inscription shares the identical tick.
+If the tick value is not unique, operation on the second or later deployed one should carry id as a mandatory parameter to avoid confliction. Otherwise, op will be considered as upon the very first inscription shares the identical tick.
 
 |tuple|type|mandatory|description|
 |-|-|-|-|
@@ -81,18 +90,18 @@ If the tick value is not unique, operation on the second or later deployed one s
 |decimal|U256|optional|must not be less than 0, default 0, max 18. this parameter will be adopted by all parameters regarding balance or change of token amount, including `max` `lim` `amt` etc.|
 |max|U256|yes|max supply for this inscription token, must be positive|
 |lim|U256|yes|max amount for each mint transaction, must be positive, must be divisible by `max`|
-|miners|array\[address\]|no|array of miners consensus addresses. once set, mint is valid only if the tx is mined by one of miners listed here. If empty array is provided, it means no restrictions on miners.|
+|miners|array\[address\]|optional|array of miners consensus addresses. once set, mint is valid only if the tx is mined by one of miners listed here. If empty array is provided, it means no restrictions on miners.|
 
-JSON Example:
+application/json Example:
 ```
 data:,
 {
   "p":"bnb-48",
   "op":"deploy",
-  "tick":"fans",
-  "decimal":"6",
-  "max":"3388230000000",
-  "lim":"1000000",
+  "tick":"cz",
+  "decimal":6,
+  "max":3388230000000,
+  "lim":1000000,
   "miners":[
     "0x72b61c6014342d914470eC7aC2975bE345796c2b"
   ]
@@ -104,17 +113,13 @@ the limit of each mint is `lmt` / 10^`decimal` = 1
 
 The txhash of this very transaction which carries the deploy command is an important unique identity for this inscription token
 
-Moreover, `tick-hash` is defied as deploy hash.  e.g. 
-
-`tick` of bnb-48 fans is `fans`
+Moreover, `tick-hash` is defied as deploy hash.
 
 `tick-hash` of bnb-48 fans is `0xd893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2`
 
-In order to be backward compatible, `tick-hash` is not an mandaory parameter. Notice once it is provided, indexer should make sure the op is only valid if the `tick-hash` does carry an deploy op with tick of the value in `tick` parameter.
-
 ### recap
 
-The sender, must be the owner, adjust the max supply of an previously deployed inscription. 
+The sender, must be the owner (sender of the deploy op, and must not be reannounced), adjusts the parameter of an previously deployed inscription. 
 
 New max supply must not be bigger than last valid one. In another word, it's only possible to shrink supply. Increasing is not allowed.
 
@@ -124,21 +129,21 @@ Right at the block height where recap command is confirmed on chain, if the tota
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "recap"|
-|tick|string|yes|symbol of this inscription token|
-|tick-hash|string|no|tick-hash of this inscription token|
-|max|U256|yes|new target max supply for this inscription token,must be positive, must not be bigger than previous valid max supply|
+|~tick~|string|deprecated|symbol of this inscription token|
+|tick-hash|string|yes|id of this inscription token|
+|max|U256|yes|new target max supply for this inscription token,must not be bigger than previous valid max supply|
 
-
-JSON Example:
+application/json Example:
 ```
 data:,
 {
   "p":"bnb-48",
   "op":"recap",
-  "tick":"fans",
-  "max":"1000000"
+  "tick-hash":"0xd893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2",
+  "max":1000000
 }
 ```
+
 ### mint
 
 Sender mint a deployed inscription for `to` address of the carrier tx
@@ -147,19 +152,19 @@ Sender mint a deployed inscription for `to` address of the carrier tx
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "mint"|
-|tick|string|yes|symbol of this inscription token|
-|tick-hash|string|no|tick-hash of this inscription token|
+|~tick~|string|deprecated|symbol of this inscription token|
+|tick-hash|string|yes|id of this inscription token|
 |amt|U256|yes|must be positive, must not be bigger than the lim parameter in deploy command|
 
 
-JSON Example:
+application/json Example:
 ```
 data:,
 {
   "p":"bnb-48",
   "op":"mint",
-  "tick":"fans",
-  "amt":"1"
+  "tick-hash":"0xd893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2",
+  "amt":1
 }
 ```
 ### transfer
@@ -170,21 +175,20 @@ The sender, transfer its own inscription to other wallet.
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "transfer"|
-|tick|string|yes|symbol of this inscription token|
-|tick-hash|string|no|tick-hash of this inscription token|
+|tick-hash|string|yes|id of this inscription token|
 |to|address|yes|asset receiver|
 |amt|U256|yes|must be positive, must not be bigger than balance of current sender address|
 
 
-JSON Example:
+application/json Example:
 ```
 data:,
 {
   "p":"bnb-48",
   "op":"transfer",
-  "tick":"fans",
+  "tick-hash":"0xd893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2",
   "to":"0x72b61c6014342d914470eC7aC2975bE345796c2b",
-  "amt":"1"
+  "amt":1
 }
 ```
 ### burn
@@ -197,19 +201,18 @@ Total supply of this inscription token should be deducted accordingly
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "burn"|
-|tick|string|yes|symbol of this inscription token|
-|tick-hash|string|no|tick-hash of this inscription token|
+|tick-hash|string|yes|id of this inscription token|
 |amt|U256|yes|must be positive, must not be bigger than balance of current sender address|
 
 
-JSON Example:
+application/json Example:
 ```
 data:,
 {
   "p":"bnb-48",
   "op":"burn",
-  "tick":"fans",
-  "amt":"1"
+  "tick-hash":"0xd893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2",
+  "amt":1
 }
 ```
 
@@ -221,21 +224,20 @@ The sender sets the max number the spender wallet is approved to transfer on beh
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "approve"|
-|tick|string|yes|symbol of this inscription token|
-|tick-hash|string|no|tick-hash of this inscription token|
+|tick-hash|string|no|id of this inscription token|
 |spender|address|yes|spender|
 |amt|U256|yes|must be positive, must not be bigger than the max supply|
 
 
-JSON Example:
+application/json Example:
 ```
 data:,
 {
   "p":"bnb-48",
   "op":"approve",
-  "tick":"fans",
+  "tick-hash":"0xd893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2",
   "spender":"0x72b61c6014342d914470eC7aC2975bE345796c2b",
-  "amt":"1"
+  "amt":1
 }
 ```
 ### transferFrom
@@ -247,22 +249,22 @@ Once succeed, transfered amount should be deducted from sender's approved amount
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "transferFrom"|
-|tick|string|yes|symbol of this inscription token|
-|tick-hash|string|no|tick-hash of this inscription token|
+|tick-hash|string|no|id of this inscription token|
 |from|address|yes|of which the sender spend on behalf|
 |to|address|yes|asset receiver|
 |amt|U256|yes|must be positive, must not be bigger than balance of parameter from address, must not be bigger than sender's remaining approved amount by parameter from|
 
 
-JSON Example:
+application/json Example:
 ```
 data:,
 {
   "p":"bnb-48",
   "op":"transferFrom",
-  "tick":"fans",
+  "tick-hash":"0xd893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2",
   "from":"0x72b61c6014342d914470eC7aC2975bE345796c2b",
   "to":"0x72b61c6014342d914470eC7aC2975bE345796c2b",
-  "amt":"1"
+  "amt":1
 }
+
 ```
