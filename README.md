@@ -60,7 +60,7 @@ data:JSON,
   }
 ]
 ```
-Specially, `mint` command must be a standalone command. If bulk commands in a single transaction contains a `mint`, the entire transaction should be considered as invalid.
+Specially, `mint` `recap` and `deploy` command must be a standalone command. If bulk commands in a single transaction contains a `mint` `recap` or `deploy`, the entire transaction should be considered as invalid.
 
 
 Indexer should correctly parse the data object according to data format instead of relying on a fixed piece of (hex) data.
@@ -101,6 +101,12 @@ In this case:
 the max supply is `max` / 10^`decimal` = 3388230
 the limit of each mint is `lmt` / 10^`decimal` = 1
 
+The txhash of this very transaction which carries the deploy command is an important unique identity for this inscription token, called `deploy hash`
+Moreover, `tick-hash` is defied as `tick`+`deploy hash`, where `0x` is trimmed.  e.g. 
+`tich` of bnb-48 fans is `fans`
+`tick-hash` of bnb-48 is `fans-d893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2`
+You can use any of above to specify the token you would like to operate, do notice `tich-hash` is recommended over `tich` in other op command, to avoid identity confliction
+
 ### recap
 
 The sender, must be the owner, adjust the max supply of an previously deployed inscription. 
@@ -113,7 +119,8 @@ Right at the block height where recap command is confirmed on chain, if the tota
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "recap"|
-|tick|string|yes|symbol of this inscription token|
+|tick|string|no|symbol of this inscription token|
+|tick-hash|string|no|tich-hash of this inscription token|
 |max|U256|yes|new target max supply for this inscription token,must be positive, must not be bigger than previous valid max supply|
 
 
@@ -135,7 +142,8 @@ Sender mint a deployed inscription for `to` address of the carrier tx
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "mint"|
-|tick|string|yes|symbol of this inscription token|
+|tick|string|no|symbol of this inscription token|
+|tick-hash|string|no|tich-hash of this inscription token|
 |amt|U256|yes|must be positive, must not be bigger than the lim parameter in deploy command|
 
 
@@ -157,7 +165,8 @@ The sender, transfer its own inscription to other wallet.
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "transfer"|
-|tick|string|yes|symbol of this inscription token|
+|tick|string|no|symbol of this inscription token|
+|tick-hash|string|no|tich-hash of this inscription token|
 |to|address|yes|asset receiver|
 |amt|U256|yes|must be positive, must not be bigger than balance of current sender address|
 
@@ -183,7 +192,8 @@ Total supply of this inscription token should be deducted accordingly
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "burn"|
-|tick|string|yes|symbol of this inscription token|
+|tick|string|no|symbol of this inscription token|
+|tick-hash|string|no|tich-hash of this inscription token|
 |amt|U256|yes|must be positive, must not be bigger than balance of current sender address|
 
 
@@ -206,7 +216,8 @@ The sender sets the max number the spender wallet is approved to transfer on beh
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "approve"|
-|tick|string|yes|symbol of this inscription token|
+|tick|string|no|symbol of this inscription token|
+|tick-hash|string|no|tich-hash of this inscription token|
 |spender|address|yes|spender|
 |amt|U256|yes|must be positive, must not be bigger than the max supply|
 
@@ -231,7 +242,8 @@ Once succeed, transfered amount should be deducted from sender's approved amount
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "transferFrom"|
-|tick|string|yes|symbol of this inscription token|
+|tick|string|no|symbol of this inscription token|
+|tick-hash|string|no|tich-hash of this inscription token|
 |from|address|yes|of which the sender spend on behalf|
 |to|address|yes|asset receiver|
 |amt|U256|yes|must be positive, must not be bigger than balance of parameter from address, must not be bigger than sender's remaining approved amount by parameter from|
