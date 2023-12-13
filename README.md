@@ -28,7 +28,7 @@ data:,
 {
   "p":"bnb-48",
   "op":"command",
-  "parameter1":value
+  "parameter1":"value"
   ...
 }
 ```
@@ -39,7 +39,7 @@ data:application/json,
 {
   "p":"bnb-48",
   "op":"command",
-  "parameter1":value
+  "parameter1":"value"
   ...
 }
 ```
@@ -72,7 +72,7 @@ data:application/json,
 
 Indexer should correctly parse the data object according to data format instead of relying on a fixed piece of (hex) data, which means, spaces and breaks don't change a command, as well as the serialized sequence of key-value pairs. 
 
-Another important thing is, value types defined in this document should be respect, filling in string (quoted by \") will be treated as invalid command.
+To maintain the compatibility of cross-platform, all tuples in data object should be a string, i.e. quoted by \".
 
 ## Command
 
@@ -85,7 +85,7 @@ The sender deploys a new inscription following bnb-48 standard and acts as the r
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "deploy"|
 |tick|string|yes|symbol of this inscription token|
-|decimal|U256|optional|must not be less than 0, default 0, max 18. this parameter will be adopted by all parameters regarding balance or change of token amount, including `max` `lim` `amt` etc.|
+|decimals|U256|optional|must not be less than 0, default 0, max 18. this parameter will be adopted by all parameters regarding balance or change of token amount, including `max` `lim` `amt` etc.|
 |max|U256|yes|max supply for this inscription token, must be positive|
 |lim|U256|yes|max amount for each mint transaction, must be positive, must be divisible by `max`|
 |miners|array\[address\]|optional|array of miners consensus addresses. once set, mint is valid only if the tx is mined by one of miners listed here. If empty array is provided, it means no restrictions on miners.|
@@ -97,9 +97,9 @@ data:,
   "p":"bnb-48",
   "op":"deploy",
   "tick":"cz",
-  "decimal":6,
-  "max":3388230000000,
-  "lim":1000000,
+  "decimals":"6",
+  "max":"3388230000000",
+  "lim":"1000000",
   "miners":[
     "0x72b61c6014342d914470eC7aC2975bE345796c2b"
   ]
@@ -138,7 +138,7 @@ data:,
   "p":"bnb-48",
   "op":"recap",
   "tick-hash":"0xd893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2",
-  "max":1000000
+  "max":"1000000"
 }
 ```
 
@@ -162,7 +162,7 @@ data:,
   "p":"bnb-48",
   "op":"mint",
   "tick-hash":"0xd893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2",
-  "amt":1
+  "amt":"1"
 }
 ```
 ### transfer
@@ -186,7 +186,7 @@ data:,
   "op":"transfer",
   "tick-hash":"0xd893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2",
   "to":"0x72b61c6014342d914470eC7aC2975bE345796c2b",
-  "amt":1
+  "amt":"1"
 }
 ```
 ### burn
@@ -210,7 +210,7 @@ data:,
   "p":"bnb-48",
   "op":"burn",
   "tick-hash":"0xd893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2",
-  "amt":1
+  "amt":"1"
 }
 ```
 
@@ -235,7 +235,7 @@ data:,
   "op":"approve",
   "tick-hash":"0xd893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2",
   "spender":"0x72b61c6014342d914470eC7aC2975bE345796c2b",
-  "amt":1
+  "amt":"1"
 }
 ```
 ### transferFrom
@@ -262,7 +262,7 @@ data:,
   "tick-hash":"0xd893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2",
   "from":"0x72b61c6014342d914470eC7aC2975bE345796c2b",
   "to":"0x72b61c6014342d914470eC7aC2975bE345796c2b",
-  "amt":1
+  "amt":"1"
 }
 
 ```
