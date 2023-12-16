@@ -240,7 +240,7 @@ data:,
 ```
 ### transferFrom
 
-The sender, transfer inscription of the parameter from  to the transaction `to` address.
+The sender, transfer inscription of the parameter `from`  to the transaction `to` address.
 Once succeed, transfered amount should be deducted from sender's approved amount by parameter from.
 
 |tuple|type|mandatory|description|
