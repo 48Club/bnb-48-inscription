@@ -49,6 +49,30 @@ Indexer should correctly parse the data object according to data format instead 
 
 To maintain the compatibility of cross-platform, all tuples in data object should be a string, i.e. quoted by \".
 
+Bulk commands are allowed when all commands share an op. If multiple commands is carried in a sigle transaction, the data should be packed in an array, each item of which contains a complete command, and each command will be handled in order. In which case, all combined commands are executed atomicly, i.e. either all of them are successfully executed or none of them.
+
+Specially, `mint` `recap` and `deploy` command must be a standalone command. If bulk commands in a single transaction contains a `mint` `recap` or `deploy`, the entire bulk should be considered as invalid.
+
+example:
+
+```
+data:application/json,
+[
+  {
+    "p":"bnb-48",
+    "op":"transfer",
+    "tick":"token1",
+    ...
+  },
+  {
+    "p":"bnb-48",
+    "op":"transfer",
+    "tick":"token2",
+    ...
+  }
+]
+```
+
 ## Command
 
 ### deployment
