@@ -61,8 +61,8 @@ The sender deploys a new inscription following bnb-48 standard and acts as the r
 |op|string|yes|fixed, "deploy"|
 |tick|string|yes|symbol of this inscription token|
 |decimals|U256|optional|must not be less than 0, default 0, max 18. this parameter will be adopted by all parameters regarding balance or change of token amount, including `max` `lim` `amt` etc.|
-|max|U256|yes|max supply for this inscription token, must be positive|
-|lim|U256|yes|max amount for each mint transaction, must be positive, must be divisible by `max`|
+|max|string|yes|max supply for this inscription token, must be positive|
+|lim|string|yes|max amount for each mint transaction, must be positive, must be divisible by `max`|
 |miners|array\[address\]|optional|array of miners consensus addresses. once set, mint is valid only if the tx is mined by one of miners listed here. If empty array is provided, it means no restrictions on miners.|
 
 application/json Example:
@@ -72,7 +72,7 @@ data:,
   "p":"bnb-48",
   "op":"deploy",
   "tick":"cz",
-  "decimals":"6",
+  "decimals":6,
   "max":"3388230000000",
   "lim":"1000000",
   "miners":[
@@ -127,7 +127,7 @@ Sender mint a deployed inscription for `to` address of the carrier tx
 |op|string|yes|fixed, "mint"|
 |~tick~|string|deprecated|symbol of this inscription token|
 |tick-hash|string|yes|id of this inscription token|
-|amt|U256|yes|must be positive, must not be bigger than the lim parameter in deploy command|
+|amt|string|yes|must be positive, must not be bigger than the lim parameter in deploy command|
 
 
 application/json Example:
@@ -150,7 +150,7 @@ The sender, transfer its own inscription to other wallet.
 |op|string|yes|fixed, "transfer"|
 |tick-hash|string|yes|id of this inscription token|
 |to|address|yes|asset receiver|
-|amt|U256|yes|must be positive, must not be bigger than balance of current sender address|
+|amt|string|yes|must be positive, must not be bigger than balance of current sender address|
 
 
 application/json Example:
@@ -175,7 +175,7 @@ Total supply of this inscription token should be deducted accordingly
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "burn"|
 |tick-hash|string|yes|id of this inscription token|
-|amt|U256|yes|must be positive, must not be bigger than balance of current sender address|
+|amt|string|yes|must be positive, must not be bigger than balance of current sender address|
 
 
 application/json Example:
@@ -199,7 +199,7 @@ The sender sets the max number the spender wallet is approved to transfer on beh
 |op|string|yes|fixed, "approve"|
 |tick-hash|string|no|id of this inscription token|
 |spender|address|yes|spender|
-|amt|U256|yes|must be positive, must not be bigger than the max supply|
+|amt|string|yes|must be positive, must not be bigger than the max supply|
 
 
 application/json Example:
@@ -225,7 +225,7 @@ Once succeed, transfered amount should be deducted from sender's approved amount
 |tick-hash|string|no|id of this inscription token|
 |from|address|yes|of which the sender spend on behalf|
 |to|address|yes|asset receiver|
-|amt|U256|yes|must be positive, must not be bigger than balance of parameter from address, must not be bigger than sender's remaining approved amount by parameter from|
+|amt|string|yes|must be positive, must not be bigger than balance of parameter from address, must not be bigger than sender's remaining approved amount by parameter from|
 
 
 application/json Example:
