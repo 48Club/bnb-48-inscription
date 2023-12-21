@@ -84,7 +84,6 @@ data:application/json,
 ]
 ```
 
-
 Indexer should correctly parse the data object according to data format instead of relying on a fixed piece of (hex) data, which means, spaces and breaks don't change a command, as well as the serialized sequence of key-value pairs. 
 
 To maintain the compatibility of cross-platform, all tuples in data object should be a string, i.e. quoted by \".
@@ -256,7 +255,7 @@ data:,
 ```
 ### transferFrom
 
-The sender, transfer inscription of the parameter from  to the transaction `to` address.
+The sender, transfer inscription of the parameter `from`  to the transaction `to` address.
 Once succeed, transfered amount should be deducted from sender's approved amount by parameter from.
 
 |tuple|type|mandatory|description|
