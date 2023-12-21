@@ -49,28 +49,36 @@ Indexer should correctly parse the data object according to data format instead 
 
 To maintain the compatibility of cross-platform, all tuples in data object should be a string, i.e. quoted by \".
 
-Bulk commands are allowed when all commands share an op. If multiple commands is carried in a sigle transaction, the data should be packed in an array, each item of which contains a complete command, and each command will be handled in order. In which case, all combined commands are executed atomicly, i.e. either all of them are successfully executed or none of them.
+Bulk commands are allowed when all commands share an op. If multiple commands is carried in a sigle transaction, the data should be packed in an array named `cmdq` i.e. command queue, each item of which contains a complete command, and each command will be handled in order. In which case, all combined commands are executed atomicly, i.e. either all of them are successfully executed or none of them.
 
-Specially, `mint` `recap` and `deploy` command must be a standalone command. If bulk commands in a single transaction contains a `mint` `recap` or `deploy`, the entire bulk should be considered as invalid.
+Specially, following commands can not be part of a bulk commands tx. If bulk commands in a single transaction contains one of them, the entire bulk should be considered as invalid:
+`deploy`
+`mint`
+`recap`
+
 
 example:
 
 ```
 data:application/json,
-[
-  {
-    "p":"bnb-48",
-    "op":"transfer",
-    "tick":"token1",
-    ...
-  },
-  {
-    "p":"bnb-48",
-    "op":"transfer",
-    "tick":"token2",
-    ...
-  }
-]
+{
+  "p":"bnb-48",
+  "op":"bulk",
+  "cmdq":[
+    {
+      "p":"bnb-48",
+      "op":"transfer",
+      "tick":"token1",
+      ...
+    },
+    {
+      "p":"bnb-48",
+      "op":"transfer",
+      "tick":"token2",
+      ...
+    }
+  ]
+}
 ```
 
 ## Command
@@ -87,7 +95,9 @@ The sender deploys a new inscription following bnb-48 standard and acts as the r
 |decimals|U256|optional|must not be less than 0, default 0, max 18. this parameter will be adopted by all parameters regarding balance or change of token amount, including `max` `lim` `amt` etc.|
 |max|U256|yes|max supply for this inscription token, must be positive|
 |lim|U256|yes|max amount for each mint transaction, must be positive, must be divisible by `max`|
-|miners|array\[address\]|optional|array of miners consensus addresses. once set, mint is valid only if the tx is mined by one of miners listed here. If empty array is provided, it means no restrictions on miners.|
+|miners|array\[address\]|optional|array of miners consensus addresses. once set, mint is valid only if the tx is mined by one of miners listed here. Optional but must not be empty array.|
+|minters|array\[address\]|optional|array of minters addresses. once set, mint is valid only if the `from` address is one of minters listed here. Optional but must not be empty array.|
+|commence|U256|optiona|the earliest block height when mint of this token is valid|
 
 application/json Example:
 ```
@@ -101,7 +111,11 @@ data:,
   "lim":"1000000",
   "miners":[
     "0x72b61c6014342d914470eC7aC2975bE345796c2b"
-  ]
+  ],
+  "minters":[
+    "0x72b61c6014342d914470eC7aC2975bE345796c2b"
+  ],
+  "commence":"300000000"
 }
 ```
 In this case: 
@@ -113,6 +127,8 @@ The txhash of this very transaction which carries the deploy command is an impor
 Moreover, `tick-hash` is defied as deploy hash.
 
 `tick-hash` of bnb-48 fans is `0xd893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2`
+
+`mint` won't be valid until height 300000000
 
 ### recap
 
@@ -143,7 +159,7 @@ data:,
 
 ### mint
 
-Sender mint a deployed inscription for `to` address of the carrier tx
+`from` address mint a deployed inscription for `to` address of the carrier tx, while `from` must not be an contract.Otherwise it will be invalid command anyway even if it's in the minters parameter of deploy command.
 
 |tuple|type|mandatory|description|
 |-|-|-|-|
@@ -151,7 +167,7 @@ Sender mint a deployed inscription for `to` address of the carrier tx
 |op|string|yes|fixed, "mint"|
 |~tick~|string|deprecated|symbol of this inscription token|
 |tick-hash|string|yes|id of this inscription token|
-|amt|U256|yes|must be positive, must not be bigger than the lim parameter in deploy command|
+|amt|U256|yes|non-zero, must not be bigger than the lim parameter in deploy command|
 
 
 application/json Example:
@@ -174,7 +190,7 @@ The sender, transfer its own inscription to other wallet.
 |op|string|yes|fixed, "transfer"|
 |tick-hash|string|yes|id of this inscription token|
 |to|address|yes|asset receiver|
-|amt|U256|yes|must be positive, must not be bigger than balance of current sender address|
+|amt|U256|yes|non-zero, must not be bigger than balance of current sender address|
 
 
 application/json Example:
@@ -199,7 +215,7 @@ Total supply of this inscription token should be deducted accordingly
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "burn"|
 |tick-hash|string|yes|id of this inscription token|
-|amt|U256|yes|must be positive, must not be bigger than balance of current sender address|
+|amt|U256|yes|non-zero, must not be bigger than balance of current sender address|
 
 
 application/json Example:
@@ -223,7 +239,7 @@ The sender sets the max number the spender wallet is approved to transfer on beh
 |op|string|yes|fixed, "approve"|
 |tick-hash|string|no|id of this inscription token|
 |spender|address|yes|spender|
-|amt|U256|yes|must be positive, must not be bigger than the max supply|
+|amt|U256|yes|must not be bigger than the max supply|
 
 
 application/json Example:
@@ -239,7 +255,7 @@ data:,
 ```
 ### transferFrom
 
-The sender, transfer inscription of the parameter from  to the transaction `to` address.
+The sender, transfer inscription of the parameter `from`  to the transaction `to` address.
 Once succeed, transfered amount should be deducted from sender's approved amount by parameter from.
 
 |tuple|type|mandatory|description|
@@ -249,7 +265,7 @@ Once succeed, transfered amount should be deducted from sender's approved amount
 |tick-hash|string|no|id of this inscription token|
 |from|address|yes|of which the sender spend on behalf|
 |to|address|yes|asset receiver|
-|amt|U256|yes|must be positive, must not be bigger than balance of parameter from address, must not be bigger than sender's remaining approved amount by parameter from|
+|amt|U256|yes|must not be bigger than balance of parameter from address, must not be bigger than sender's remaining approved amount by parameter from|
 
 
 application/json Example:
