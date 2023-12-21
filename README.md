@@ -18,9 +18,21 @@ The bnb-48 inscription standard ensures a structured and identifiable format for
 Notably, bnb-48 serves as a standard for inscription originated on the BNB Smart Chain, with '48' denoting its association with the 48 Club.
 
 ## Data format:
-The data part typically consists of an serialized data object following [data URL scheme](https://datatracker.ietf.org/doc/html/rfc2397). If the format notation is not provided, data object will be treated as `application/json` defaultly.
+For EOA address, commands defined here can be carried easily by call data.
 
 On chains which don't support plain text memo, like EVM compatible chains, data load should be converted from utf-8 to hex before being put in to call data.
+
+For contract address (e.g. EVM compatible chains), it's required to emit an event defined as below:
+```
+event bnb48_protocol_transfer(
+    address indexed to,
+    U256 amount,
+);
+```
+This way a contract will be able to be an op command sender.
+
+The data part typically consists of an serialized data object following [data URL scheme](https://datatracker.ietf.org/doc/html/rfc2397). If the format notation is not provided, data object will be treated as `application/json` defaultly.
+
 
 An example:
 ```
@@ -45,6 +57,33 @@ data:application/json,
 ```
 Where json is explicitly specified.
 
+## Bulk ops
+Bulk commands are allowed when all commands share an op. 
+
+If multiple commands is carried in a sigle transaction, the data should be packed in an array, each item of which contains a complete command, and each command will be handled in natural order. In which case, all combined commands are executed as one atomicly, i.e. either all of them are successfully executed or none of them.
+
+Specially, `mint` `recap` and `deploy` command must be a standalone command. If bulk commands in a single transaction contains a `mint` `recap` or `deploy`, the entire bulk should be considered as invalid.
+
+example:
+
+```
+data:application/json,
+[
+  {
+    "p":"bnb-48",
+    "op":"transfer",
+    "tick":"token1",
+    ...
+  },
+  {
+    "p":"bnb-48",
+    "op":"transfer",
+    "tick":"token2",
+    ...
+  }
+]
+```
+
 Indexer should correctly parse the data object according to data format instead of relying on a fixed piece of (hex) data, which means, spaces and breaks don't change a command, as well as the serialized sequence of key-value pairs. 
 
 To maintain the compatibility of cross-platform, all tuples in data object should be a string, i.e. quoted by \".
@@ -64,6 +103,7 @@ The sender deploys a new inscription following bnb-48 standard and acts as the r
 |max|U256|yes|max supply for this inscription token, must be positive|
 |lim|U256|yes|max amount for each mint transaction, must be positive, must be divisible by `max`|
 |miners|array\[address\]|optional|array of miners consensus addresses. once set, mint is valid only if the tx is mined by one of miners listed here. If empty array is provided, it means no restrictions on miners.|
+|minters|array\[address\]|optional|array of minters addresses. once set, only addresses in this array are eligible to send mint command (don't have to be the receiver)|
 
 application/json Example:
 ```
@@ -77,13 +117,13 @@ data:,
   "lim":"1000000",
   "miners":[
     "0x72b61c6014342d914470eC7aC2975bE345796c2b"
+  ],
+
+  "minters":[
+    "0x72b61c6014342d914470eC7aC2975bE345796c2b"
   ]
 }
 ```
-In this case: 
-the max supply is `max` / 10^`decimal` = 3388230
-the limit of each mint is `lmt` / 10^`decimal` = 1
-
 The txhash of this very transaction which carries the deploy command is an important unique identity for this inscription token
 
 Moreover, `tick-hash` is defied as deploy hash.
