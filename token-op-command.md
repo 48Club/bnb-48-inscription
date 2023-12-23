@@ -45,10 +45,18 @@ data:application/json,
 ```
 Where json is explicitly specified.
 
+
+### Integrity
+
 Indexer should correctly parse the data object according to data format instead of relying on a fixed piece of (hex) data, which means, spaces and breaks don't change a command, as well as the serialized sequence of key-value pairs. 
 
 To maintain the compatibility of cross-platform, all tuples in data object should be a string, i.e. quoted by \".
 
+A command is only valid if all tuples in data object are valid.
+
+For each key-value pair, if the key is defined in this document, the value must be valid according to the definition, otherwise the entire command is dismissed; if the key is not defined in this document, this key is ignored without impacting the integrity of the entire command. Which means specific application is capable to attach customized meta data in op command.
+
+### Bulk
 Bulk commands are allowed when all commands share an op. If multiple commands is carried in a sigle transaction, the data should be packed in an array named `cmdq` i.e. command queue, each item of which contains a complete command, and each command will be handled in order. In which case, all combined commands are executed atomicly, i.e. either all of them are successfully executed or none of them.
 
 Specially, following commands can not be part of a bulk commands tx. If bulk commands in a single transaction contains one of them, the entire bulk should be considered as invalid:
@@ -95,8 +103,9 @@ The sender deploys a new inscription following bnb-48 standard and acts as the r
 |decimals|U256|optional|must not be less than 0, default 0, max 18. this parameter will be adopted by all parameters regarding balance or change of token amount, including `max` `lim` `amt` etc.|
 |max|U256|yes|max supply for this inscription token, must be positive|
 |lim|U256|yes|max amount for each mint transaction, must be positive, must be divisible by `max`|
-|miners|array\[address\]|optional|array of miners consensus addresses. once set, mint is valid only if the tx is mined by one of miners listed here. Optional but must not be empty array.|
-|minters|array\[address\]|optional|array of minters addresses. once set, mint is valid only if the `from` address is one of minters listed here. Optional but must not be empty array.|
+|ratelim|U256|optiona|how many mint txs is allowed at the same block height from an identical sender|
+|miners|array\[address\]|optional|array of miners consensus addresses. once set, mint is valid only if the tx is sent by one of miners listed here. Optional, but once provided must not be empty array.|
+|minters|array\[address\]|optional|array of minters addresses. once set, mint is valid only if the `from` address is one of minters listed here. Optional, but once provided must not be empty array.|
 |commence|U256|optiona|the earliest block height when mint of this token is valid|
 
 application/json Example:
@@ -109,6 +118,7 @@ data:,
   "decimals":"6",
   "max":"3388230000000",
   "lim":"1000000",
+  "ratelim":"10",
   "miners":[
     "0x72b61c6014342d914470eC7aC2975bE345796c2b"
   ],
@@ -119,16 +129,12 @@ data:,
 }
 ```
 In this case: 
-the max supply is `max` / 10^`decimal` = 3388230
-the limit of each mint is `lmt` / 10^`decimal` = 1
+1. the max supply is `max` / 10^`decimal` = 3388230
+2. the limit of each mint is `lmt` / 10^`decimal` = 1
+3. "Only the first 10 mints for each block height are valid; starting from the 11th mint, the indexer should consider it as invalid."
+4. `mint` won't be valid until height 300000000
 
-The txhash of this very transaction which carries the deploy command is an important unique identity for this inscription token
-
-Moreover, `tick-hash` is defied as deploy hash.
-
-`tick-hash` of bnb-48 fans is `0xd893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2`
-
-`mint` won't be valid until height 300000000
+Moreover, `tick-hash` is defied as deploy hash e.g. `tick-hash` of bnb-48 fans is `0xd893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2`
 
 ### recap
 
