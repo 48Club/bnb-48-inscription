@@ -52,12 +52,12 @@ Indexer should correctly parse the data object according to data format instead 
 
 To maintain the compatibility of cross-platform, all tuples in data object should be a string, i.e. quoted by \".
 
-A command is only valid if all tuples in data object are valid.
-
 For each key-value pair, if the key is defined in this document, the value must be valid according to the definition, otherwise the entire command is dismissed; if the key is not defined in this document, this key is ignored without impacting the integrity of the entire command. Which means specific application is capable to attach customized meta data in op command.
 
+A command is only valid if all values of defined keys in data object are valid.
+
 ### Bulk
-Bulk commands are allowed when all commands share an op. If multiple commands is carried in a sigle transaction, the data should be packed in an array named `cmdq` i.e. command queue, each item of which contains a complete command, and each command will be handled in order. In which case, all combined commands are executed atomicly, i.e. either all of them are successfully executed or none of them.
+Bulk commands are allowed when all commands share an op. If multiple commands is carried in a sigle transaction, the data should be packed in an array named `cmdq` i.e. command queue, each item of which contains a complete command, and each command will be handled in order. In which case, all combined commands are executed atomicly, i.e. either all of them are valid and successfully executed or none of them.
 
 Specially, following commands can not be part of a bulk commands tx. If bulk commands in a single transaction contains one of them, the entire bulk should be considered as invalid:
 `deploy`
