@@ -159,7 +159,7 @@ data:,
 
 ### mint
 
-`from` address mint a deployed inscription for `to` address of the carrier tx, while `from` must not be an contract.Otherwise it will be invalid command anyway even if it's in the minters parameter of deploy command.
+`from` address mint a deployed inscription for `to` address of the carrier tx, while `from` must not be an contract unless it's one of the `minters` parameter of corresponding deploy command.
 
 |tuple|type|mandatory|description|
 |-|-|-|-|
