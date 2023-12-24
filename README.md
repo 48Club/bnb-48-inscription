@@ -98,7 +98,7 @@ The sender deploys a new inscription following bnb-48 standard and acts as the r
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "deploy"|
-|tick|string|yes|symbol of this inscription token|
+|tick|string|yes|symbol of this inscription token,  can only consist of uppercase and lowercase letters, and numbers. Maximum of 16 characters.|
 |decimals|U256|optional|must not be less than 0, default 0, max 18. this parameter will be adopted by all parameters regarding balance or change of token amount, including `max` `lim` `amt` etc.|
 |max|U256|yes|max supply for this inscription token, must be positive|
 |lim|U256|yes|max amount for each mint transaction, must be positive, must be divisible by `max`|
