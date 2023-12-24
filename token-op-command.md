@@ -106,6 +106,8 @@ The sender deploys a new inscription following bnb-48 standard and acts as the r
 |ratelim|U256|optiona|how many mint txs is allowed at the same block height from an identical sender|
 |miners|array\[address\]|optional|array of miners consensus addresses. once set, mint is valid only if the tx is sent by one of miners listed here. Optional, but once provided must not be empty array.|
 |minters|array\[address\]|optional|array of minters addresses. once set, mint is valid only if the `from` address is one of minters listed here. Optional, but once provided must not be empty array.|
+|reserves|map\{address:amount\}|optional|array of initial distribution on a series of addresses, sum
+of amounts in which is part of max supply|
 |commence|U256|optiona|the earliest block height when mint of this token is valid|
 
 application/json Example:
@@ -125,14 +127,20 @@ data:,
   "minters":[
     "0x72b61c6014342d914470eC7aC2975bE345796c2b"
   ],
+  "reserves":[
+    "0x72b61c6014342d914470eC7aC2975bE345796c2b":"100000000",
+    "0x82b61c6014342d914470eC7aC2975bE345796c2b":"100000000"
+  ],
   "commence":"300000000"
 }
 ```
 In this case: 
 1. the max supply is `max` / 10^`decimal` = 3388230
 2. the limit of each mint is `lmt` / 10^`decimal` = 1
-3. "Only the first 10 mints for each block height are valid; starting from the 11th mint, the indexer should consider it as invalid."
+3. Only the first 10 mints in each block height are valid; starting from the 11th mint, the indexer should consider it as invalid.
 4. `mint` won't be valid until height 300000000
+5. Two addresses received airdrop, 100.00 for each. The remaining mintable supply is
+   3388030, from the very beginning.
 
 Moreover, `tick-hash` is defied as deploy hash e.g. `tick-hash` of bnb-48 fans is `0xd893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2`
 
