@@ -283,7 +283,7 @@ data:,
 ```
 
 ### info
-Allowing deployer to showing additional information of the project contract address or wallet address for explent meaning of them. Indexing and showing in the platform. Any inscriptions has to fill the project info first for the blue verified mark. Any cheating or hiding will cause the inscription get backlist and no more indexed.
+Enabling deployers to display additional information such as the project contract address or wallet address to enhance the clarity of their meaning. The platform will index and display this information. To obtain the blue verified mark, deployers must complete the project information. Any attempts at deception or concealment will result in the inscription being blacklisted and no longer indexed.
 
 |tuple|type|mandatory|description|
 |-|-|-|-|
@@ -299,8 +299,8 @@ data:,
   "p":"bnb-48",
   "op":"info",
   "tick-hash":"0xd893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2",
-
-"addr":[    "0x72b61c6014342d914470eC7aC2975bE345796c2b"
+  "addr":[
+    "0x72b61c6014342d914470eC7aC2975bE345796c2b"
   ]
 }
 
