@@ -306,7 +306,7 @@ Allowing deployer to showing additional information of the project contract addr
 |tick-hash|string|no|id of this inscription token|
 |addr|json objects[^1]|yes| Wallet address or contract address controlled by the deployer|
 
-[^1] addr like:{"address":"infomation","address":"infomation",...}
+[^1]: addr like:{"address":"infomation","address":"infomation",...}
 
 application/json Example:
 ```
