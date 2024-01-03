@@ -304,7 +304,9 @@ Allowing deployer to showing additional information of the project contract addr
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "info"|
 |tick-hash|string|no|id of this inscription token|
-|addr|array\[address\]|yes| Wallet address or contract address controlled by the deployer|
+|addr|json objects[^1]|yes| Wallet address or contract address controlled by the deployer|
+
+[^1] addr like:{"address":"infomation","address":"infomation",...}
 
 application/json Example:
 ```
@@ -313,9 +315,10 @@ data:,
   "p":"bnb-48",
   "op":"info",
   "tick-hash":"0xd893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2",
-
-"addr":[    "0x72b61c6014342d914470eC7aC2975bE345796c2b"
-  ]
+  "addr":{
+    "0x72b61c6014342d914470eC7aC2975bE345796c2b":"hot wallet",
+    ...
+  }
 }
 
 ```
