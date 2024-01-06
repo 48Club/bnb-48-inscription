@@ -23,12 +23,15 @@ owner of this collection will automatically be the sender
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "releasecol"|
+|title|string|yes|Title of this collection|
+|desc|string|yes|Description of this collection|
 |artsets|array[as-hash]|yes|artSets to be included in this collection; all artSets must be owned by the `from` address; each artSet can only be included in one collection;all artSets must not share media id i.e. any media id must be unique across all these artSets|
 |whitelists|array[address]|optional|who can mint nft free in this collection; if not provided or empty array is provided, there is no restriction on forging|
 |tick-hash|string|optional|inscription token as price/fragments of this collection; if not provided, tick-hash will be set to $fans ' tick-hash i.e. 0xd893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2 |
 |forgeprice|U256|optional|default 0; How many token the whitelist pays to owner while forging; this value should be the original number without decimals consideration.|
 |reforgeprice|U256|optional|How many fragments can one NFT be melt into, or forged with; this value should be the original number without decimals consideration.|
 |taxrate|U256|optional|decimal 4, round to floor; e.g. 500 means 0.05 i.e. 5% ; this parameter means the tax rate paid to collection owner when an NFT is traded on market; market dApp should respect this parameter, but this is not guaranteed by code|
+
 
 # update collection
 
@@ -40,9 +43,11 @@ must be sent from the owner address
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "updatecol"|
 |collection-hash|string|yes|collection-hash of the collection|
+|title|string|optional|Title of this collection|
+|desc|string|optional|Description of this collection|
 |whitelists|array[address]|optional|who can mint nft free in this collection|
 |owner|address|optional|current owner of this collection|
-|forgeprice|U256|optional|default 0; How many token the whitelist pays to owner while forging; this value should be the original number without decimals consideration.|
+|forgeprice|U256|optional|default 0; How many token the whitelist pays to owner while forging;|
 |taxrate|U256|optional|decimal4, round to floor|
 
 
@@ -80,6 +85,7 @@ Fragments inscription token will be deposit to a special account associated with
 
 Melt an self-held NFT into fragments inscription tokens, fund comes from collection deposit account
 Notice that a NFT is only meltable when collection deposit account is filled by any previous reforge operation
+Once done, corresponding token deducted from collection deposit account
 If there is no enough token, melt fails
 
 Once melt, art id of this NFT becomes available again, can be (re)forged again.
