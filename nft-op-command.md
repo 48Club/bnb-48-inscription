@@ -1,4 +1,4 @@
-# upload artset
+# create artset
 Author inscript  multi-media on chain, preparing for future release event.
 `as-hash` is defined as the hash of the transaction carries this op
 owner of this artSet will automatically be the sender
@@ -20,7 +20,7 @@ so id of arts starts from the existing id + 1
 |tuple|type|mandatory|description|
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
-|op|string|yes|fixed, "artset"|
+|op|string|yes|fixed, "appendartset"|
 |as-hash|string|optional|existing|
 |medias|array[string]|yes|media array of this collection, content|
 
