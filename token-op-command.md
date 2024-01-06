@@ -1,106 +1,4 @@
-# Standards of bnb-48 Inscription
-
-## Introduction:
-The process of inscription involves a sequence of commands affixed to transactions. 
-
-The bnb-48 inscription standard ensures a structured and identifiable format for commands attached to transactions on any block chain. The integration of these specifications aims to provide clarity and coherence in the execution of operations.
-
-
-## Main Features
-1. Block Chain Transparency. bnb-48 standard is suitable for any blockchain, as far as transactions on this chain supports calldata/memo/remark etc. It's super easy for indexers to track bnb-48 inscription even across different blockchains.
-2. Unlike an NFT standard, bnb-48 is not designed for non-fungible tokens. This design choice facilitates native bulk transfers.
-3. Providing functionality interfaces similar to ERC-20, these interfaces form the foundational infrastructure for DeFi.
-4. Multi commands are allowed to be carried in a single tx, ensuring a cost-effective and efficient process.
-5. Multiple serialization formats support. Developer is free to choose read-freindly format like json or efficiency orientation format like protobuffer.
-6. Backward compatible upgradability.
-
-
-Notably, bnb-48 serves as a standard for inscription originated on the BNB Smart Chain, with '48' denoting its association with the 48 Club.
-
-## Data format:
-For EOA address, commands defined here can be carried easily by call data.
-
-On chains which don't support plain text memo, like EVM compatible chains, data load should be converted from utf-8 to hex before being put in to call data.
-
-For contract address (e.g. EVM compatible chains), it's required to emit an event defined as below:
-```
-event bnb48_protocol_transfer(
-    address indexed to,
-    U256 amount,
-);
-```
-This way a contract will be able to be an op command sender.
-
-The data part typically consists of an serialized data object following [data URL scheme](https://datatracker.ietf.org/doc/html/rfc2397). If the format notation is not provided, data object will be treated as `application/json` defaultly.
-
-An example:
-```
-data:,
-{
-  "p":"bnb-48",
-  "op":"command",
-  "parameter1":"value"
-  ...
-}
-```
-or
-
-```
-data:application/json, 
-{
-  "p":"bnb-48",
-  "op":"command",
-  "parameter1":"value"
-  ...
-}
-```
-Where json is explicitly specified.
-
-
-### Integrity
-
-Indexer should correctly parse the data object according to data format instead of relying on a fixed piece of (hex) data, which means, spaces and breaks don't change a command, as well as the serialized sequence of key-value pairs. 
-
-To maintain the compatibility of cross-platform, all tuples in data object should be a string, i.e. quoted by \".
-
-For each key-value pair, if the key is defined in this document, the value must be valid according to the definition, otherwise the entire command is dismissed; if the key is not defined in this document, this key is ignored without impacting the integrity of the entire command. Which means specific application is capable to attach customized meta data in op command.
-
-A command is only valid if all values of defined keys in data object are valid.
-
-### Bulk
-Bulk commands are allowed when all commands share an op. 
-
-If multiple commands is carried in a sigle transaction, the data should be packed in an array, each item of which contains a complete command, and each command will be handled in natural order. In which case, all combined commands are executed as one atomicly, i.e. either all of them are successfully executed or none of them.
-
-Specially, `mint` `recap` and `deploy` command must be a standalone command. If bulk commands in a single transaction contains a `mint` `recap` or `deploy`, the entire bulk should be considered as invalid.
-
-example:
-
-```
-data:application/json,
-[
-  {
-    "p":"bnb-48",
-    "op":"transfer",
-    "tick":"token1",
-    ...
-  },
-  {
-    "p":"bnb-48",
-    "op":"transfer",
-    "tick":"token2",
-    ...
-  }
-]
-```
-
-Indexer should correctly parse the data object according to data format instead of relying on a fixed piece of (hex) data, which means, spaces and breaks don't change a command, as well as the serialized sequence of key-value pairs. 
-
-To maintain the compatibility of cross-platform, all tuples in data object should be a string, i.e. quoted by \".
-
-## Command
-
-### deployment
+# deployment
 
 The sender deploys a new inscription following bnb-48 standard and acts as the role of owner.
 
@@ -153,7 +51,7 @@ In this case:
 
 Moreover, `tick-hash` is defied as deploy hash e.g. `tick-hash` of bnb-48 fans is `0xd893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2`
 
-### recap
+# recap
 
 The sender, must be the owner (sender of the deploy op, and must not be reannounced), adjusts the parameter of an previously deployed inscription. 
 
@@ -180,7 +78,7 @@ data:,
 }
 ```
 
-### mint
+# mint
 
 `from` address mint a deployed inscription for `to` address of the carrier tx, while `from` must not be an contract unless it's one of the `minters` parameter of corresponding deploy command.
 
@@ -203,7 +101,7 @@ data:,
   "amt":"1"
 }
 ```
-### transfer
+# transfer
 
 The sender, transfer its own inscription to other wallet.
 
@@ -227,7 +125,7 @@ data:,
   "amt":"1"
 }
 ```
-### burn
+# burn
 
 The sender, burn its own inscription
 
@@ -252,7 +150,7 @@ data:,
 }
 ```
 
-### approve
+# approve
 
 The sender sets the max number the spender wallet is approved to transfer on behalf of the sender
 
@@ -276,7 +174,7 @@ data:,
   "amt":"1"
 }
 ```
-### transferFrom
+# transferFrom
 
 The sender, transfer inscription of the parameter `from`  to the transaction `to` address.
 Once succeed, transfered amount should be deducted from sender's approved amount by parameter from.
