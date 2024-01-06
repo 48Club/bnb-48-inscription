@@ -53,7 +53,8 @@ must be sent from the owner address
 
 # forge a NFT
 
-Pick an available art from collection and mint it into an NFT as a whitelisted wallet
+Pick an available art from collection and mint it into an NFT as a whitelisted wallet.
+If no whitelisted provided for this collection, all wallets are treated as whitelisted.
 If `from` wallet is not whitelisted, this operation fails.
 If there is a non-zero forge price, it should be deducted from sender's wallet, otherwise fails.
 Notice that this price directly goes to owner, and not refundable.
