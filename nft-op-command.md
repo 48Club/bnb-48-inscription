@@ -1,0 +1,63 @@
+# upload artset
+Author inscript  multi-media on chain, preparing for future release event.
+upload artset can not be part of bulk operations
+`as-tick-hash` is defined as the hash of the transaction carries this op
+owner of this artSet will automatically be the sender
+
+|tuple|type|mandatory|description|
+|-|-|-|-|
+|p|string|yes|fixed, "bnb-48"|
+|op|string|yes|fixed, "artset"|
+|astick|string|optional|symbol of this artset|
+|medias|map{U256:string}|yes|media map of this collection, id:content|
+|format|string|yes|the format of media content how frontend parses|
+
+# release collection
+
+Release a NFT collection from one or more art sets
+`collection-hash` is defined as the hash of the transaction carries this op
+
+|tuple|type|mandatory|description|
+|-|-|-|-|
+|p|string|yes|fixed, "bnb-48"|
+|op|string|yes|fixed, "releasecollection"|
+|artsets|array[as-tick-hash]|yes|artSets to be included in this collection; all artSets must be owned by the `from` address; each artSet can only be included in one collection;all artSets must not share media id i.e. any media id must be unique across all these artSets|
+|whitelists|array[address]|optional|who can mint nft free in this collection|
+|tich-hash|string|optional|inscription token as fragments of this collection; if not provided, tick-hash will be set to $fans ' tick-hash i.e. 0xd893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2 |
+|price|U256|optional|How many fragments can one NFT be melt into, or forged with; this value should be the original number without decimals consideration.|
+
+# update collection
+
+update whitelist of a released collection
+|tuple|type|mandatory|description|
+|-|-|-|-|
+|p|string|yes|fixed, "bnb-48"|
+|op|string|yes|fixed, "releasecollection"|
+|collection-hash|string|yes|collection-hash of the collection|
+|whitelists|array[address]|optional|who can mint nft free in this collection|
+
+
+# forge a NFT
+
+Pick an available art from collection and mint it into an NFT as a whitelisted wallet
+If `from` wallet is not whitelisted, this operation fails.
+|tuple|type|mandatory|description|
+|-|-|-|-|
+|p|string|yes|fixed, "bnb-48"|
+|op|string|yes|fixed, "forge"|
+|collection-hash|string|yes|of the NFT set|
+|artid|U256|yes|id of the art in the entire artset(s); notice that once an artid is (re)forged, it can not be forged again until it is melted|
+
+
+# reforge a NFT
+
+Pick an available art from collection and mint it into an NFT with specified amount of fragments (inscription token) 
+Corresponding price will be deducted from `from` wallet, if there is no sufficient holding, this operation failed.
+Fragments inscription token will be deposit to a special account associated with this nft collection.
+
+|tuple|type|mandatory|description|
+|-|-|-|-|
+|p|string|yes|fixed, "bnb-48"|
+|op|string|yes|fixed, "reforge"|
+|collection-hash|string|yes|of the NFT set|
+|artid|U256|yes|id of the art in the entire artset(s); notice that once an artid is (re)forged, it can not be forged again until it is melted|
