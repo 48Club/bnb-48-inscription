@@ -1,0 +1,80 @@
+## Data format:
+For EOA address, commands defined here can be carried easily by call data.
+
+On chains which don't support plain text memo, like EVM compatible chains, data load should be converted from utf-8 to hex before being put in to call data.
+
+For contract address (e.g. EVM compatible chains), it's required to emit an event defined as below:
+```
+event bnb48_protocol_transfer(
+    address indexed to,
+    U256 amount,
+);
+```
+This way a contract will be able to be an op command sender.
+
+The data part typically consists of an serialized data object following [data URL scheme](https://datatracker.ietf.org/doc/html/rfc2397). If the format notation is not provided, data object will be treated as `application/json` defaultly.
+
+An example:
+```
+data:,
+{
+  "p":"bnb-48",
+  "op":"command",
+  "parameter1":"value"
+  ...
+}
+```
+or
+
+```
+data:application/json, 
+{
+  "p":"bnb-48",
+  "op":"command",
+  "parameter1":"value"
+  ...
+}
+```
+Where json is explicitly specified.
+
+
+### Integrity
+
+Indexer should correctly parse the data object according to data format instead of relying on a fixed piece of (hex) data, which means, spaces and breaks don't change a command, as well as the serialized sequence of key-value pairs. 
+
+To maintain the compatibility of cross-platform, all tuples in data object should be a string, i.e. quoted by \".
+
+For each key-value pair, if the key is defined in this document, the value must be valid according to the definition, otherwise the entire command is dismissed; if the key is not defined in this document, this key is ignored without impacting the integrity of the entire command. Which means specific application is capable to attach customized meta data in op command.
+
+A command is only valid if all values of defined keys in data object are valid.
+
+### Bulk
+Bulk commands are allowed when all commands share an op. 
+
+If multiple commands is carried in a sigle transaction, the data should be packed in an array, each item of which contains a complete command, and each command will be handled in natural order. In which case, all combined commands are executed as one atomicly, i.e. either all of them are successfully executed or none of them.
+
+Specially, `mint` `recap` and `deploy` command must be a standalone command. If bulk commands in a single transaction contains a `mint` `recap` or `deploy`, the entire bulk should be considered as invalid.
+
+example:
+
+```
+data:application/json,
+[
+  {
+    "p":"bnb-48",
+    "op":"transfer",
+    "tick":"token1",
+    ...
+  },
+  {
+    "p":"bnb-48",
+    "op":"transfer",
+    "tick":"token2",
+    ...
+  }
+]
+```
+
+Indexer should correctly parse the data object according to data format instead of relying on a fixed piece of (hex) data, which means, spaces and breaks don't change a command, as well as the serialized sequence of key-value pairs. 
+
+To maintain the compatibility of cross-platform, all tuples in data object should be a string, i.e. quoted by \".
