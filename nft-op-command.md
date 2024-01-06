@@ -35,7 +35,7 @@ owner of this collection will automatically be the sender
 
 # update collection
 
-update owner/whitelist/tax of a released collection. The new whitelist set will replace the old one entirely.
+update a released collection. The new whitelist set will replace the old one entirely.
 must be sent from the owner address
 
 |tuple|type|mandatory|description|
