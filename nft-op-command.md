@@ -1,16 +1,28 @@
 # upload artset
 Author inscript  multi-media on chain, preparing for future release event.
-upload artset can not be part of bulk operations
 `as-hash` is defined as the hash of the transaction carries this op
 owner of this artSet will automatically be the sender
+each media (or art) should be allocated to an unique id, U256, starts from 1
 
 |tuple|type|mandatory|description|
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "artset"|
 |as-tick|string|optional|symbol of this artset|
-|medias|map{U256:string}|yes|media map of this collection, id:content|
+|medias|array[string]|yes|media array of this collection, content|
 |format|string|yes|the format of media content how frontend parses|
+
+# append artset
+artset owner append some more arts into existing artset
+all arts must not share media id i.e. any media id must be unique
+so id of arts starts from the existing id + 1
+
+|tuple|type|mandatory|description|
+|-|-|-|-|
+|p|string|yes|fixed, "bnb-48"|
+|op|string|yes|fixed, "artset"|
+|as-hash|string|optional|existing|
+|medias|array[string]|yes|media array of this collection, content|
 
 # release collection
 
@@ -19,13 +31,15 @@ Release a NFT collection from one or more art sets
 
 owner of this collection will automatically be the sender
 
+once released, the artset will be frozen i.e. can not be appended any more
+
 |tuple|type|mandatory|description|
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
 |op|string|yes|fixed, "releasecol"|
 |title|string|yes|Title of this collection|
 |desc|string|yes|Description of this collection|
-|artsets|array[as-hash]|yes|artSets to be included in this collection; all artSets must be owned by the `from` address; each artSet can only be included in one collection;all artSets must not share media id i.e. any media id must be unique across all these artSets|
+|as-hash|as-hash|yes|artset to be included in this collection; artSet must be owned by the `from` address; |
 |whitelists|array[address]|optional|who can mint nft free in this collection; if not provided or empty array is provided, there is no restriction on forging|
 |forgetoken|tick-hash|optional|inscription token as forge price of this collection; if not provided, tick-hash will be set to $fans ' tick-hash i.e. 0xd893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2 |
 |forgeprice|U256|optional|default 0; How many token the whitelist pays to owner while forging; this value should be the original number without decimals consideration.|
