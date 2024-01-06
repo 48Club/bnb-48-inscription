@@ -27,9 +27,10 @@ owner of this collection will automatically be the sender
 |desc|string|yes|Description of this collection|
 |artsets|array[as-hash]|yes|artSets to be included in this collection; all artSets must be owned by the `from` address; each artSet can only be included in one collection;all artSets must not share media id i.e. any media id must be unique across all these artSets|
 |whitelists|array[address]|optional|who can mint nft free in this collection; if not provided or empty array is provided, there is no restriction on forging|
-|tick-hash|string|optional|inscription token as price/fragments of this collection; if not provided, tick-hash will be set to $fans ' tick-hash i.e. 0xd893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2 |
+|forgetoken|tick-hash|optional|inscription token as forge price of this collection; if not provided, tick-hash will be set to $fans ' tick-hash i.e. 0xd893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2 |
 |forgeprice|U256|optional|default 0; How many token the whitelist pays to owner while forging; this value should be the original number without decimals consideration.|
-|reforgeprice|U256|optional|How many fragments can one NFT be melt into, or forged with; this value should be the original number without decimals consideration.|
+|reforgetoken|tick-hash|optional|inscription token as fragments of this collection; if not provided, tick-hash will be set to $fans ' tick-hash i.e. 0xd893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2 |
+|reforgeprice|U256|optional|How many fragments can one NFT be melt into, or reforged with; this value should be the original number without decimals consideration.|
 |taxrate|U256|optional|decimal 4, round to floor; e.g. 500 means 0.05 i.e. 5% ; this parameter means the tax rate paid to collection owner when an NFT is traded on market; market dApp should respect this parameter, but this is not guaranteed by code|
 
 
@@ -47,6 +48,7 @@ must be sent from the owner address
 |desc|string|optional|Description of this collection|
 |whitelists|array[address]|optional|who can mint nft free in this collection|
 |owner|address|optional|current owner of this collection|
+|forgetoken|tick-hash|optional|inscription token as price/fragments of this collection; if not provided, tick-hash will be set to $fans ' tick-hash i.e. 0xd893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2 |
 |forgeprice|U256|optional|default 0; How many token the whitelist pays to owner while forging;|
 |taxrate|U256|optional|decimal4, round to floor|
 
