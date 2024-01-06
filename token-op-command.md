@@ -18,9 +18,20 @@ The bnb-48 inscription standard ensures a structured and identifiable format for
 Notably, bnb-48 serves as a standard for inscription originated on the BNB Smart Chain, with '48' denoting its association with the 48 Club.
 
 ## Data format:
-The data part typically consists of an serialized data object following [data URL scheme](https://datatracker.ietf.org/doc/html/rfc2397). If the format notation is not provided, data object will be treated as `application/json` defaultly.
+For EOA address, commands defined here can be carried easily by call data.
 
 On chains which don't support plain text memo, like EVM compatible chains, data load should be converted from utf-8 to hex before being put in to call data.
+
+For contract address (e.g. EVM compatible chains), it's required to emit an event defined as below:
+```
+event bnb48_protocol_transfer(
+    address indexed to,
+    U256 amount,
+);
+```
+This way a contract will be able to be an op command sender.
+
+The data part typically consists of an serialized data object following [data URL scheme](https://datatracker.ietf.org/doc/html/rfc2397). If the format notation is not provided, data object will be treated as `application/json` defaultly.
 
 An example:
 ```
@@ -57,37 +68,35 @@ For each key-value pair, if the key is defined in this document, the value must 
 A command is only valid if all values of defined keys in data object are valid.
 
 ### Bulk
-Bulk commands are allowed when all commands share an op. If multiple commands is carried in a sigle transaction, the data should be packed in an array named `cmdq` i.e. command queue, each item of which contains a complete command, and each command will be handled in order. In which case, all combined commands are executed atomicly, i.e. either all of them are valid and successfully executed or none of them.
+Bulk commands are allowed when all commands share an op. 
 
-Specially, following commands can not be part of a bulk commands tx. If bulk commands in a single transaction contains one of them, the entire bulk should be considered as invalid:
-`deploy`
-`mint`
-`recap`
+If multiple commands is carried in a sigle transaction, the data should be packed in an array, each item of which contains a complete command, and each command will be handled in natural order. In which case, all combined commands are executed as one atomicly, i.e. either all of them are successfully executed or none of them.
 
+Specially, `mint` `recap` and `deploy` command must be a standalone command. If bulk commands in a single transaction contains a `mint` `recap` or `deploy`, the entire bulk should be considered as invalid.
 
 example:
 
 ```
 data:application/json,
-{
-  "p":"bnb-48",
-  "op":"bulk",
-  "cmdq":[
-    {
-      "p":"bnb-48",
-      "op":"transfer",
-      "tick":"token1",
-      ...
-    },
-    {
-      "p":"bnb-48",
-      "op":"transfer",
-      "tick":"token2",
-      ...
-    }
-  ]
-}
+[
+  {
+    "p":"bnb-48",
+    "op":"transfer",
+    "tick":"token1",
+    ...
+  },
+  {
+    "p":"bnb-48",
+    "op":"transfer",
+    "tick":"token2",
+    ...
+  }
+]
 ```
+
+Indexer should correctly parse the data object according to data format instead of relying on a fixed piece of (hex) data, which means, spaces and breaks don't change a command, as well as the serialized sequence of key-value pairs. 
+
+To maintain the compatibility of cross-platform, all tuples in data object should be a string, i.e. quoted by \".
 
 ## Command
 
@@ -104,8 +113,8 @@ The sender deploys a new inscription following bnb-48 standard and acts as the r
 |max|U256|yes|max supply for this inscription token, must be positive|
 |lim|U256|yes|max amount for each mint transaction, must be positive, must be divisible by `max`|
 |ratelim|U256|optiona|how many mint txs is allowed at the same block height from an identical sender|
-|miners|array\[address\]|optional|array of miners consensus addresses. once set, mint is valid only if the tx is sent by one of miners listed here. Optional, but once provided must not be empty array.|
-|minters|array\[address\]|optional|array of minters addresses. once set, mint is valid only if the `from` address is one of minters listed here. Optional, but once provided must not be empty array.|
+|miners|array\[address\]|optional|array of miners consensus addresses. once set, mint is valid only if the tx is mined by one of miners listed here. If empty array is provided, it means no restrictions on miners.|
+|minters|array\[address\]|optional|array of minters addresses. once set, only addresses in this array are eligible to send mint command (don't have to be the receiver)|
 |reserves|map\{address:amount\}|optional|array of initial distribution on a series of addresses, sum
 of amounts in which is part of max supply|
 |commence|U256|optiona|the earliest block height when mint of this token is valid|
