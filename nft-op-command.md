@@ -68,8 +68,6 @@ Pick an available art from collection and mint it into an NFT as a whitelisted w
 If no whitelisted provided for this collection, all wallets are treated as whitelisted.
 If `from` wallet is not whitelisted, this operation fails.
 
-Each whitelist is entitled to forge one NFT in this collection lifetime, the second attempt will fail. Indexer should keep an forge history to make sure this rule works.
-
 |tuple|type|mandatory|description|
 |-|-|-|-|
 |p|string|yes|fixed, "bnb-48"|
