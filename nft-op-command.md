@@ -10,7 +10,6 @@ each media (or art) should be allocated to an unique id, U256, starts from 1
 |op|string|yes|fixed, "artset"|
 |as-tick|string|optional|symbol of this artset|
 |medias|array[string]|yes|media array of this collection, content|
-|format|string|yes|the format of media content how frontend parses|
 
 # append artset
 artset owner append some more arts into existing artset
