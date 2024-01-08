@@ -1,0 +1,4 @@
+https://snapshots.48.club/inscriptions_34175786-35067693.sql.zst
+
+## How to download and extract
+`wget https://snapshots.48.club/inscriptions_34175786-35067693.sql.zst -O - | zstd -cd`

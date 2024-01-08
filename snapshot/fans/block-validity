@@ -1,4 +1,4 @@
-First bnb-48 deploy transaction 
+First bnb-48 deploy transaction
 34175786
 https://bscscan.com/tx/0xd893ca77b3122cb6c480da7f8a12cb82e19542076f5895f21446258dc473a7c2
 
@@ -7,3 +7,6 @@ EVM.ink deprecated
 
 Indexer commence height
 #34464848
+
+Future Enable (burn, approve and transferFrom)
+#35084848
